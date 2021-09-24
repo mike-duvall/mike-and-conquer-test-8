@@ -3,7 +3,7 @@ apply plugin: "groovy"
 apply plugin: "idea"
 
 version = "1.0"
-description = "mike-and-conquer-test"
+description = "mike-and-conquer-test-8"
 
 sourceCompatibility = 1.8
 
