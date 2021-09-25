@@ -68,10 +68,13 @@ class MikeAndConquerGameClient {
 //                body:   inputMinigunner ,
 //                requestContentType: 'application/json' )
 
-        def resp = restClient.get(
-                path: 'WeatherForecast',
-                requestContentType: 'application/json' )
+//        def resp = restClient.get(
+//                path: 'WeatherForecast',
+//                requestContentType: 'application/json' )
 
+        def resp = restClient.get(
+                path: 'minigunners',
+                requestContentType: 'application/json' )
 
         assert resp.status == 200
 
