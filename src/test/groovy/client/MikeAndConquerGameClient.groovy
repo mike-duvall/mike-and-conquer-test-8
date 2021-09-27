@@ -62,7 +62,7 @@ class MikeAndConquerGameClient {
         Minigunner inputMinigunner = new Minigunner()
         inputMinigunner.x = minigunnerX
         inputMinigunner.y = minigunnerY
-        inputMinigunner.aiIsOn = aiIsOn
+//        inputMinigunner.aiIsOn = aiIsOn
 //        def resp = restClient.post(
 //                path: baseUrl,
 //                body:   inputMinigunner ,
@@ -72,11 +72,16 @@ class MikeAndConquerGameClient {
 //                path: 'WeatherForecast',
 //                requestContentType: 'application/json' )
 
-        def resp = restClient.get(
+//        def resp = restClient.get(
+//                path: 'minigunners',
+//                requestContentType: 'application/json' )
+
+        def resp = restClient.post(
                 path: 'minigunners',
+                body:   inputMinigunner ,
                 requestContentType: 'application/json' )
 
-        assert resp.status == 200
+        assert resp.status == 201
 
 //        Minigunner minigunner = new Minigunner()
 //        minigunner.id = resp.responseData.id
