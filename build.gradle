@@ -1,35 +1,58 @@
 apply plugin: "groovy"
 
-apply plugin: "idea"
-
 version = "1.0"
 description = "mike-and-conquer-test-8"
 
+// Spock works with Java 1.8 and above
 sourceCompatibility = 1.8
 
 repositories {
   // Spock releases are available from Maven Central
   mavenCentral()
   // Spock snapshots are available from the Sonatype OSS snapshot repository
-  maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+  maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
   // mandatory dependencies for using Spock
-  compile "org.codehaus.groovy:groovy-all:2.4.1"
-  testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
+  implementation "org.codehaus.groovy:groovy:3.0.8"
+  testImplementation platform("org.spockframework:spock-bom:2.0-groovy-3.0")
+  testImplementation "org.spockframework:spock-core"
+  testImplementation "org.spockframework:spock-junit4"  // you can remove this if your code does not rely on old JUnit 4 rules
 
   // optional dependencies for using Spock
-  testCompile "org.hamcrest:hamcrest-core:1.3" // only necessary if Hamcrest matchers are used
-  testRuntime "cglib:cglib-nodep:3.1"          // allows mocking of classes (in addition to interfaces)
-  testRuntime "org.objenesis:objenesis:2.1"    // allows mocking of classes without default constructor (together with CGLIB)
+  testImplementation "org.hamcrest:hamcrest-core:2.2"   // only necessary if Hamcrest matchers are used
+  testRuntimeOnly "net.bytebuddy:byte-buddy:1.11.0" // allows mocking of classes (in addition to interfaces)
+  testRuntimeOnly "org.objenesis:objenesis:3.2"      // allows mocking of classes without default constructor (together with ByteBuddy or CGLIB)
 
-  testCompile group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.6'
+  // dependencies used by examples in this project
+  testRuntimeOnly "com.h2database:h2:1.4.197"
+  implementation "org.codehaus.groovy:groovy-sql:3.0.8"
 
-  compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
+
+//  testImplementation group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.6'
+  // https://mvnrepository.com/artifact/org.codehaus.groovy.modules.http-builder/http-builder
+  testImplementation group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
+
+
+//  testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
+// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+  testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+
+  // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-xml
+  implementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '3.0.9'
+
+  // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-json
+  implementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '3.0.9'
+
 
 }
 
-
+test {
+  useJUnitPlatform()
+  testLogging {
+    events "passed", "skipped", "failed"
+  }
+}
 
 

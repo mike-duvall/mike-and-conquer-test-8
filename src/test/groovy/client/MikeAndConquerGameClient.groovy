@@ -73,11 +73,11 @@ class MikeAndConquerGameClient {
 //                requestContentType: 'application/json' )
 
 //        def resp = restClient.get(
-//                path: 'minigunners',
+//                path: '/minigunners',
 //                requestContentType: 'application/json' )
 
         def resp = restClient.post(
-                path: 'minigunners',
+                path: '/minigunners',
                 body:   inputMinigunner ,
                 requestContentType: 'application/json' )
 
