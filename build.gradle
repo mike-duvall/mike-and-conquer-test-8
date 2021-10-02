@@ -25,24 +25,10 @@ dependencies {
   testRuntimeOnly "net.bytebuddy:byte-buddy:1.11.0" // allows mocking of classes (in addition to interfaces)
   testRuntimeOnly "org.objenesis:objenesis:3.2"      // allows mocking of classes without default constructor (together with ByteBuddy or CGLIB)
 
-  // dependencies used by examples in this project
-  testRuntimeOnly "com.h2database:h2:1.4.197"
-  implementation "org.codehaus.groovy:groovy-sql:3.0.8"
 
-
-//  testImplementation group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.6'
-  // https://mvnrepository.com/artifact/org.codehaus.groovy.modules.http-builder/http-builder
   testImplementation group: 'org.codehaus.groovy.modules.http-builder', name: 'http-builder', version: '0.7.1'
-
-
-//  testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
-// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
   testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
-
-  // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-xml
   implementation group: 'org.codehaus.groovy', name: 'groovy-xml', version: '3.0.9'
-
-  // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-json
   implementation group: 'org.codehaus.groovy', name: 'groovy-json', version: '3.0.9'
 
 

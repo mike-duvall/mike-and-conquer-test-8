@@ -13,29 +13,6 @@ import spock.util.concurrent.PollingConditions
 class MiscTests extends Specification {
 
 
-    def "test1"() {
-        given:
-        int x = 3
-
-
-        when:
-        x=4
-        RESTClient client = new RESTClient("http://localhost:5000")
-        def path = "/minigunners"
-        def response
-        try {
-            response = client.get(path: path)
-            assert response.statusCode == 200
-            assert response.json?.headers?.host == "postman-echo.com"
-        } catch (Exception e) {
-            assert e?.response?.statusCode != 200
-        }
-
-
-        then:
-        true
-    }
-
     def "Add minigunner and move across screen"() {
         given:
         String localhost = "localhost"
@@ -45,9 +22,7 @@ class MiscTests extends Specification {
 //        String host = remoteHost
 
         int port = 5000
-//        int port = 5555
         boolean useTimeouts = true
-//        boolean useTimeouts = false
         MikeAndConquerGameClient gameClient = new MikeAndConquerGameClient(host, port, useTimeouts )
 
         when:
