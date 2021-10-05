@@ -26,10 +26,15 @@ class MiscTests extends Specification {
         MikeAndConquerGameClient gameClient = new MikeAndConquerGameClient(host, port, useTimeouts )
 
         when:
-        gameClient.addGDIMinigunnerAtMapSquare(5,5)
+        gameClient.addGDIMinigunnerAtMapSquare(2,2)
 
         then:
         true
+//        and:
+//        List<GameEvent> gameEventList = gameClient.getGameEvents()
+//
+//        then:
+//        assert gameEventList.size() == 1
 
     }
 
