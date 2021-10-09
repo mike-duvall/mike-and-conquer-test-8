@@ -108,15 +108,36 @@ class MikeAndConquerGameClient {
         return addGDIMinigunnerAtWorldCoordinates(worldX, worldY)
     }
 
-    Minigunner addNodMinigunnerAtMapSquare(int x, int y, boolean aiIsOn) {
-        int halfMapSquareWidth = Util.mapSquareWidth / 2
-        int worldX = (x * Util.mapSquareWidth) + halfMapSquareWidth
-        int worldY = (y * Util.mapSquareWidth) + halfMapSquareWidth
+//    Minigunner addNodMinigunnerAtMapSquare(int x, int y, boolean aiIsOn) {
+//        int halfMapSquareWidth = Util.mapSquareWidth / 2
+//        int worldX = (x * Util.mapSquareWidth) + halfMapSquareWidth
+//        int worldY = (y * Util.mapSquareWidth) + halfMapSquareWidth
+//
+//        return addNodMinigunnerAtWorldCoordinates(worldX, worldY, aiIsOn)
+//    }
 
-        return addNodMinigunnerAtWorldCoordinates(worldX, worldY, aiIsOn)
+
+    def List<SimulationStateUpdateEvent> getSimulationStateUpdateEvents() {
+        def resp = restClient.get(
+                path: '/simulationStateUpdateEvents',
+                requestContentType: 'application/json' )
+
+        assert resp.status == 200
+
+        int numItems = resp.responseData.size
+
+        List<SimulationStateUpdateEvent> allSimulationStateUpdateEvents = []
+        for (int i = 0; i < numItems; i++) {
+            SimulationStateUpdateEvent simulationStateUpdateEvent = new SimulationStateUpdateEvent()
+            simulationStateUpdateEvent.X = resp.responseData[i]['x']
+            simulationStateUpdateEvent.Y = resp.responseData[i]['y']
+            simulationStateUpdateEvent.ID = resp.responseData[i]['id']
+
+            allSimulationStateUpdateEvents.add(simulationStateUpdateEvent)
+        }
+        return allSimulationStateUpdateEvents
+
+        //int x = 3
+
     }
-
-
-
-
 }

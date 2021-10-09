@@ -16,7 +16,6 @@ class MiscTests extends Specification {
     def "Add minigunner and move across screen"() {
         given:
         String localhost = "localhost"
-//        String localhost = "192.168.0.155"
         String remoteHost = "192.168.0.147"
         String host = localhost
 //        String host = remoteHost
@@ -24,17 +23,27 @@ class MiscTests extends Specification {
         int port = 5000
         boolean useTimeouts = true
         MikeAndConquerGameClient gameClient = new MikeAndConquerGameClient(host, port, useTimeouts )
+        int minigunnerXInWorldCoordinates = 60
+        int minigunnerYInWorldCoordinates = 40
+
 
         when:
-        gameClient.addGDIMinigunnerAtMapSquare(2,2)
+//        gameClient.addGDIMinigunnerAtMapSquare(2,3)
+        gameClient.addGDIMinigunnerAtWorldCoordinates(minigunnerXInWorldCoordinates, minigunnerYInWorldCoordinates)
+
+//        then:
+//        true
+        and:
+        List<SimulationStateUpdateEvent> gameEventList = gameClient.getSimulationStateUpdateEvents()
 
         then:
-        true
-//        and:
-//        List<GameEvent> gameEventList = gameClient.getGameEvents()
-//
-//        then:
-//        assert gameEventList.size() == 1
+        assert gameEventList.size() == 1
+
+        and:
+        SimulationStateUpdateEvent simulationStateUpdateEvent = gameEventList.get(0)
+        assert simulationStateUpdateEvent.X == minigunnerXInWorldCoordinates
+        assert simulationStateUpdateEvent.Y == minigunnerYInWorldCoordinates
+        assert simulationStateUpdateEvent.ID == 1
 
     }
 
