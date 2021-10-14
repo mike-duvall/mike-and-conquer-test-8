@@ -29,7 +29,7 @@ class MiscTests extends Specification {
 
         when:
 //        gameClient.addGDIMinigunnerAtMapSquare(2,3)
-        gameClient.addGDIMinigunnerAtWorldCoordinates(minigunnerXInWorldCoordinates, minigunnerYInWorldCoordinates)
+        Minigunner createdMinigunner = gameClient.addGDIMinigunnerAtWorldCoordinates(minigunnerXInWorldCoordinates, minigunnerYInWorldCoordinates)
 
 //        then:
 //        true
@@ -44,6 +44,18 @@ class MiscTests extends Specification {
         assert simulationStateUpdateEvent.X == minigunnerXInWorldCoordinates
         assert simulationStateUpdateEvent.Y == minigunnerYInWorldCoordinates
         assert simulationStateUpdateEvent.ID == 1
+
+//        when:
+//        int destinationMinigunnerXInWorldCoordinates = 100
+//        int destinationMinigunnerYInWorldCoordinates = 100
+//
+//        gameClient.moveUnit(createdMinigunner.id, destinationMinigunnerXInWorldCoordinates, destinationMinigunnerYInWorldCoordinates )
+//
+//        then:
+//        true
+//        Add validation here that minigunner arrived at destination
+//        By checking events
+//        but in polling loop to wait for proper events
 
     }
 

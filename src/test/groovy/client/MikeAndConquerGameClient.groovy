@@ -83,13 +83,12 @@ class MikeAndConquerGameClient {
 
         assert resp.status == 201
 
-//        Minigunner minigunner = new Minigunner()
-//        minigunner.id = resp.responseData.id
-//        minigunner.x = resp.responseData.x
-//        minigunner.y = resp.responseData.y
-//        minigunner.health = resp.responseData.health
-//        return minigunner
-        return null
+        Minigunner minigunner = new Minigunner()
+        minigunner.id = resp.responseData.id
+        minigunner.x = resp.responseData.x
+        minigunner.y = resp.responseData.y
+        return minigunner
+
     }
 
 
@@ -138,6 +137,22 @@ class MikeAndConquerGameClient {
         return allSimulationStateUpdateEvents
 
         //int x = 3
+
+    }
+
+    void moveUnit(int unitId, int destinationXInWorldCoordinates, int destinationYInWorldCoordinate) {
+
+        MoveUnitEvent moveUnitEvent = new MoveUnitEvent()
+        moveUnitEvent.id = unitId
+        moveUnitEvent.destinationXInWorldCoordinates = destinationXInWorldCoordinates
+        moveUnitEvent.destinationYInWorldCoordinates = destinationYInWorldCoordinate
+
+        def resp = restClient.post(
+                path: '/inputEvent',
+                body:   moveUnitEvent ,
+                requestContentType: 'application/json' )
+
+        assert resp.status == 201
 
     }
 }
