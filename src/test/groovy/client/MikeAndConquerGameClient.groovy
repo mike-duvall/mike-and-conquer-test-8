@@ -1,13 +1,9 @@
 package client
 
 import domain.*
-import groovyx.net.http.HttpResponseException
 import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
-
-import javax.imageio.ImageIO
-import java.awt.image.BufferedImage
 
 class MikeAndConquerGameClient {
 
@@ -62,24 +58,22 @@ class MikeAndConquerGameClient {
         Minigunner inputMinigunner = new Minigunner()
         inputMinigunner.x = minigunnerX
         inputMinigunner.y = minigunnerY
-//        inputMinigunner.aiIsOn = aiIsOn
+
+        CreateUnitCommand createUnitCommand = new CreateUnitCommand()
+        createUnitCommand.commandType = "CreateMinigunner"
+        createUnitCommand.startLocationXInWorldCoordinates = minigunnerX
+        createUnitCommand.startLocationYInWorldCoordinates = minigunnerY
+
 //        def resp = restClient.post(
-//                path: baseUrl,
+//                path: '/minigunners',
 //                body:   inputMinigunner ,
 //                requestContentType: 'application/json' )
 
-//        def resp = restClient.get(
-//                path: 'WeatherForecast',
-//                requestContentType: 'application/json' )
-
-//        def resp = restClient.get(
-//                path: '/minigunners',
-//                requestContentType: 'application/json' )
-
         def resp = restClient.post(
-                path: '/minigunners',
-                body:   inputMinigunner ,
-                requestContentType: 'application/json' )
+                path: '/simulation/command/admin',
+                body: createUnitCommand,
+                requestContentType: 'application/json')
+
 
         assert resp.status == 201
 
