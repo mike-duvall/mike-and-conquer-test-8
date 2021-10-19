@@ -1,6 +1,7 @@
 package client
 
 import domain.*
+import groovy.json.JsonOutput
 import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
@@ -61,13 +62,15 @@ class MikeAndConquerGameClient {
 
         CreateUnitCommand createUnitCommand = new CreateUnitCommand()
         createUnitCommand.commandType = "CreateMinigunner"
-        createUnitCommand.startLocationXInWorldCoordinates = minigunnerX
-        createUnitCommand.startLocationYInWorldCoordinates = minigunnerY
 
-//        def resp = restClient.post(
-//                path: '/minigunners',
-//                body:   inputMinigunner ,
-//                requestContentType: 'application/json' )
+        createUnitCommand.commandData =  JsonOutput.toJson([startLocationXInWorldCoordinates: minigunnerX, startLocationYInWorldCoordinates: minigunnerY])
+//        createUnitCommand.commandData["startLocationXInWorldCoordinates"] = minigunnerX
+//        createUnitCommand.commandData["startLocationYInWorldCoordinates"] = minigunnerY
+
+//        createUnitCommand.commandData = "test data"
+//        createUnitCommand.startLocationXInWorldCoordinates = minigunnerX
+//        createUnitCommand.startLocationYInWorldCoordinates = minigunnerY
+
 
         def resp = restClient.post(
                 path: '/simulation/command/admin',
@@ -136,17 +139,20 @@ class MikeAndConquerGameClient {
 
     void moveUnit(int unitId, int destinationXInWorldCoordinates, int destinationYInWorldCoordinate) {
 
-        MoveUnitEvent moveUnitEvent = new MoveUnitEvent()
-        moveUnitEvent.id = unitId
-        moveUnitEvent.destinationXInWorldCoordinates = destinationXInWorldCoordinates
-        moveUnitEvent.destinationYInWorldCoordinates = destinationYInWorldCoordinate
+        MoveUnitCommand command = new MoveUnitCommand()
+        command.commandType "MoveUnit"
+        command.unitId = unitId
+        command.destinationXInWorldCoordinates = destinationXInWorldCoordinates
+        command.destinationYInWorldCoordinates = destinationYInWorldCoordinate
 
         def resp = restClient.post(
-                path: '/inputEvent',
-                body:   moveUnitEvent ,
-                requestContentType: 'application/json' )
+                path: '/simulation/command/user',
+                body: command,
+                requestContentType: 'application/json')
 
         assert resp.status == 201
 
     }
+
+
 }

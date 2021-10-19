@@ -39,12 +39,12 @@ class MiscTests extends Specification {
         then:
         assert gameEventList.size() == 1
 
-        and:
-        SimulationStateUpdateEvent simulationStateUpdateEvent = gameEventList.get(0)
-        assert simulationStateUpdateEvent.X == minigunnerXInWorldCoordinates
-        assert simulationStateUpdateEvent.Y == minigunnerYInWorldCoordinates
-        assert simulationStateUpdateEvent.ID == 1
-
+//        and:
+//        SimulationStateUpdateEvent simulationStateUpdateEvent = gameEventList.get(0)
+//        assert simulationStateUpdateEvent.X == minigunnerXInWorldCoordinates
+//        assert simulationStateUpdateEvent.Y == minigunnerYInWorldCoordinates
+//        assert simulationStateUpdateEvent.ID == 1
+//
 //        when:
 //        int destinationMinigunnerXInWorldCoordinates = 100
 //        int destinationMinigunnerYInWorldCoordinates = 100

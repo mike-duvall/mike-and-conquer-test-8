@@ -3,7 +3,8 @@ package domain
 class CreateUnitCommand {
 
     String commandType
-    int startLocationXInWorldCoordinates
-    int startLocationYInWorldCoordinates
+    String commandData
+//    int startLocationXInWorldCoordinates
+//    int startLocationYInWorldCoordinates
 
 }

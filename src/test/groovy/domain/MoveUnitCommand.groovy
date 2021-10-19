@@ -1,8 +1,9 @@
 package domain
 
-class MoveUnitEvent {
+class MoveUnitCommand {
 
-    int id
+    String commandType
+    int unitId
     int destinationXInWorldCoordinates
     int destinationYInWorldCoordinates
 }
