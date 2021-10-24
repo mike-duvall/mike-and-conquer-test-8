@@ -2,6 +2,7 @@ package client
 
 import domain.*
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
@@ -63,14 +64,13 @@ class MikeAndConquerGameClient {
         CreateUnitCommand createUnitCommand = new CreateUnitCommand()
         createUnitCommand.commandType = "CreateMinigunner"
 
-        createUnitCommand.commandData =  JsonOutput.toJson([startLocationXInWorldCoordinates: minigunnerX, startLocationYInWorldCoordinates: minigunnerY])
-//        createUnitCommand.commandData["startLocationXInWorldCoordinates"] = minigunnerX
-//        createUnitCommand.commandData["startLocationYInWorldCoordinates"] = minigunnerY
+        def commandParams =
+            [
+                startLocationXInWorldCoordinates: minigunnerX,
+                startLocationYInWorldCoordinates: minigunnerY
+            ]
 
-//        createUnitCommand.commandData = "test data"
-//        createUnitCommand.startLocationXInWorldCoordinates = minigunnerX
-//        createUnitCommand.startLocationYInWorldCoordinates = minigunnerY
-
+        createUnitCommand.commandData =  JsonOutput.toJson(commandParams)
 
         def resp = restClient.post(
                 path: '/simulation/command/admin',
@@ -125,9 +125,21 @@ class MikeAndConquerGameClient {
         List<SimulationStateUpdateEvent> allSimulationStateUpdateEvents = []
         for (int i = 0; i < numItems; i++) {
             SimulationStateUpdateEvent simulationStateUpdateEvent = new SimulationStateUpdateEvent()
-            simulationStateUpdateEvent.X = resp.responseData[i]['x']
-            simulationStateUpdateEvent.Y = resp.responseData[i]['y']
-            simulationStateUpdateEvent.ID = resp.responseData[i]['id']
+            simulationStateUpdateEvent.eventType = resp.responseData[i].eventType
+            simulationStateUpdateEvent.eventData = resp.responseData[i].eventData
+
+//            String eventDataAsJsonString = resp.responseData[i].eventData
+//            def jsonSlurper = new JsonSlurper()
+//            def eventDataAsObject = jsonSlurper.parseText(eventDataAsJsonString)
+//
+//            simulationStateUpdateEvent.X = eventDataAsObject.X
+//            simulationStateUpdateEvent.Y = eventDataAsObject.Y
+//            simulationStateUpdateEvent.ID = eventDataAsObject.ID
+
+//            simulationStateUpdateEvent.X = resp.responseData[i].eventData['x']
+//            simulationStateUpdateEvent.Y = resp.responseData[i].eventData['y']
+//            simulationStateUpdateEvent.ID = resp.responseData[i].eventData['id']
+
 
             allSimulationStateUpdateEvents.add(simulationStateUpdateEvent)
         }
@@ -140,17 +152,25 @@ class MikeAndConquerGameClient {
     void moveUnit(int unitId, int destinationXInWorldCoordinates, int destinationYInWorldCoordinate) {
 
         MoveUnitCommand command = new MoveUnitCommand()
-        command.commandType "MoveUnit"
-        command.unitId = unitId
-        command.destinationXInWorldCoordinates = destinationXInWorldCoordinates
-        command.destinationYInWorldCoordinates = destinationYInWorldCoordinate
+        command.commandType = "OrderUnitMove"
+//        command.unitId = unitId
+
+        def commandParams =
+                [
+                        unitId: unitId,
+                        destinationLocationXInWorldCoordinates: destinationXInWorldCoordinates,
+                        destinationLocationYInWorldCoordinates: destinationYInWorldCoordinate
+                ]
+
+        command.commandData =  JsonOutput.toJson(commandParams)
+
 
         def resp = restClient.post(
                 path: '/simulation/command/user',
                 body: command,
                 requestContentType: 'application/json')
 
-        assert resp.status == 201
+        assert resp.status == 200
 
     }
 
