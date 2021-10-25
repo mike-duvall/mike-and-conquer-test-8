@@ -22,7 +22,8 @@ class MiscTests extends Specification {
 //        String host = remoteHost
 
         int port = 5000
-        boolean useTimeouts = true
+//        boolean useTimeouts = true
+        boolean useTimeouts = false
         MikeAndConquerGameClient gameClient = new MikeAndConquerGameClient(host, port, useTimeouts )
         int minigunnerXInWorldCoordinates = 60
         int minigunnerYInWorldCoordinates = 40
@@ -41,18 +42,19 @@ class MiscTests extends Specification {
         assert gameEventList.size() == 1
 
         and:
-        SimulationStateUpdateEvent simulationStateUpdateEvent = gameEventList.get(0)
-        assert simulationStateUpdateEvent.eventType == "MinigunnerCreated"
+        SimulationStateUpdateEvent firstEvent = gameEventList.get(0)
+        assert firstEvent.eventType == "MinigunnerCreated"
 
         def jsonSlurper = new JsonSlurper()
-        def eventDataAsObject = jsonSlurper.parseText(simulationStateUpdateEvent.eventData)
+        def eventDataAsObject = jsonSlurper.parseText(firstEvent.eventData)
 
-       assert eventDataAsObject.X == minigunnerXInWorldCoordinates
-       assert eventDataAsObject.Y == minigunnerYInWorldCoordinates
-       assert eventDataAsObject.ID == 1
+        assert eventDataAsObject.X == minigunnerXInWorldCoordinates
+        assert eventDataAsObject.Y == minigunnerYInWorldCoordinates
+        assert eventDataAsObject.ID == 1
+
         when:
         int destinationMinigunnerXInWorldCoordinates = 100
-        int destinationMinigunnerYInWorldCoordinates = 100
+        int destinationMinigunnerYInWorldCoordinates = 110
 
         gameClient.moveUnit(createdMinigunner.id, destinationMinigunnerXInWorldCoordinates, destinationMinigunnerYInWorldCoordinates )
 
@@ -66,6 +68,15 @@ class MiscTests extends Specification {
 
         then:
         assert gameEventList.size() == 2
+
+        SimulationStateUpdateEvent secondEvent = gameEventList.get(1)
+        assert secondEvent.eventType == "UnitOrderedToMove"
+
+        def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
+
+        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationMinigunnerXInWorldCoordinates
+        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
+        assert secondEventDataAsObject.ID == 1
 
 //        Add validation here that minigunner arrived at destination
 //        By checking events
