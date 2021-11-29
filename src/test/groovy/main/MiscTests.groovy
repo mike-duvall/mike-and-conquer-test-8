@@ -78,6 +78,27 @@ class MiscTests extends Specification {
         assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
         assert secondEventDataAsObject.ID == 1
 
+
+        when:
+        sleep(50000)
+
+        and:
+        gameEventList = gameClient.getSimulationStateUpdateEvents()
+
+
+        then:
+        assert gameEventList.size() == 3
+
+        SimulationStateUpdateEvent thirdEvent = gameEventList.get(2)
+        assert thirdEvent.eventType == "UnitArrivedAtDestination"
+
+        def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
+
+        assert thirdEventDataAsObject.XInWorldCoordinates == destinationMinigunnerXInWorldCoordinates
+        assert thirdEventDataAsObject.YInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
+        assert thirdEventDataAsObject.ID == 1
+
+
 //        Add validation here that minigunner arrived at destination
 //        By checking events
 //        but in polling loop to wait for proper events
