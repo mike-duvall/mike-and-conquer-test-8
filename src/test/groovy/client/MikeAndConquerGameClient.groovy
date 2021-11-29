@@ -1,13 +1,11 @@
 package client
 
 import domain.*
-import groovyx.net.http.HttpResponseException
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
-
-import javax.imageio.ImageIO
-import java.awt.image.BufferedImage
 
 class MikeAndConquerGameClient {
 
@@ -62,24 +60,23 @@ class MikeAndConquerGameClient {
         Minigunner inputMinigunner = new Minigunner()
         inputMinigunner.x = minigunnerX
         inputMinigunner.y = minigunnerY
-//        inputMinigunner.aiIsOn = aiIsOn
-//        def resp = restClient.post(
-//                path: baseUrl,
-//                body:   inputMinigunner ,
-//                requestContentType: 'application/json' )
 
-//        def resp = restClient.get(
-//                path: 'WeatherForecast',
-//                requestContentType: 'application/json' )
+        CreateUnitCommand createUnitCommand = new CreateUnitCommand()
+        createUnitCommand.commandType = "CreateMinigunner"
 
-//        def resp = restClient.get(
-//                path: '/minigunners',
-//                requestContentType: 'application/json' )
+        def commandParams =
+            [
+                startLocationXInWorldCoordinates: minigunnerX,
+                startLocationYInWorldCoordinates: minigunnerY
+            ]
+
+        createUnitCommand.commandData =  JsonOutput.toJson(commandParams)
 
         def resp = restClient.post(
-                path: '/minigunners',
-                body:   inputMinigunner ,
-                requestContentType: 'application/json' )
+                path: '/simulation/command/admin',
+                body: createUnitCommand,
+                requestContentType: 'application/json')
+
 
         assert resp.status == 201
 
@@ -128,9 +125,21 @@ class MikeAndConquerGameClient {
         List<SimulationStateUpdateEvent> allSimulationStateUpdateEvents = []
         for (int i = 0; i < numItems; i++) {
             SimulationStateUpdateEvent simulationStateUpdateEvent = new SimulationStateUpdateEvent()
-            simulationStateUpdateEvent.X = resp.responseData[i]['x']
-            simulationStateUpdateEvent.Y = resp.responseData[i]['y']
-            simulationStateUpdateEvent.ID = resp.responseData[i]['id']
+            simulationStateUpdateEvent.eventType = resp.responseData[i].eventType
+            simulationStateUpdateEvent.eventData = resp.responseData[i].eventData
+
+//            String eventDataAsJsonString = resp.responseData[i].eventData
+//            def jsonSlurper = new JsonSlurper()
+//            def eventDataAsObject = jsonSlurper.parseText(eventDataAsJsonString)
+//
+//            simulationStateUpdateEvent.X = eventDataAsObject.X
+//            simulationStateUpdateEvent.Y = eventDataAsObject.Y
+//            simulationStateUpdateEvent.ID = eventDataAsObject.ID
+
+//            simulationStateUpdateEvent.X = resp.responseData[i].eventData['x']
+//            simulationStateUpdateEvent.Y = resp.responseData[i].eventData['y']
+//            simulationStateUpdateEvent.ID = resp.responseData[i].eventData['id']
+
 
             allSimulationStateUpdateEvents.add(simulationStateUpdateEvent)
         }
@@ -142,17 +151,28 @@ class MikeAndConquerGameClient {
 
     void moveUnit(int unitId, int destinationXInWorldCoordinates, int destinationYInWorldCoordinate) {
 
-        MoveUnitEvent moveUnitEvent = new MoveUnitEvent()
-        moveUnitEvent.id = unitId
-        moveUnitEvent.destinationXInWorldCoordinates = destinationXInWorldCoordinates
-        moveUnitEvent.destinationYInWorldCoordinates = destinationYInWorldCoordinate
+        MoveUnitCommand command = new MoveUnitCommand()
+        command.commandType = "OrderUnitMove"
+//        command.unitId = unitId
+
+        def commandParams =
+                [
+                        unitId: unitId,
+                        destinationLocationXInWorldCoordinates: destinationXInWorldCoordinates,
+                        destinationLocationYInWorldCoordinates: destinationYInWorldCoordinate
+                ]
+
+        command.commandData =  JsonOutput.toJson(commandParams)
+
 
         def resp = restClient.post(
-                path: '/inputEvent',
-                body:   moveUnitEvent ,
-                requestContentType: 'application/json' )
+                path: '/simulation/command/user',
+                body: command,
+                requestContentType: 'application/json')
 
-        assert resp.status == 201
+        assert resp.status == 200
 
     }
+
+
 }
