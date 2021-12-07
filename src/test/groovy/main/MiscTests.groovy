@@ -3,19 +3,18 @@ package main
 import client.MikeAndConquerGameClient
 import domain.*
 import groovy.json.JsonSlurper
-import groovyx.net.http.HttpResponseException
-import groovyx.net.http.RESTClient
-import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.concurrent.PollingConditions
-//import util.Util
+
 
 class MiscTests extends Specification {
 
 
-    def "Add minigunner and move across screen"() {
-        given:
+    MikeAndConquerGameClient gameClient
+
+
+    def setup() {
         String localhost = "localhost"
         String remoteHost = "192.168.0.147"
         String host = localhost
@@ -24,24 +23,31 @@ class MiscTests extends Specification {
         int port = 5000
 //        boolean useTimeouts = true
         boolean useTimeouts = false
-        MikeAndConquerGameClient gameClient = new MikeAndConquerGameClient(host, port, useTimeouts )
+        gameClient = new MikeAndConquerGameClient(host, port, useTimeouts )
+
+
+    }
+
+    def "Add minigunner and move across screen"() {
+        given:
+
         int minigunnerXInWorldCoordinates = 60
         int minigunnerYInWorldCoordinates = 40
+        List<SimulationStateUpdateEvent>  gameEventList = null
 
 
         when:
 //        gameClient.addGDIMinigunnerAtMapSquare(2,3)
         Minigunner createdMinigunner = gameClient.addGDIMinigunnerAtWorldCoordinates(minigunnerXInWorldCoordinates, minigunnerYInWorldCoordinates)
 
-//        then:
-//        true
-        and:
-        List<SimulationStateUpdateEvent> gameEventList = gameClient.getSimulationStateUpdateEvents()
+        then:
+        assertNumberOfSimulationStateUpdateEvents(1)
+
+
+        when:
+        gameEventList = gameClient.getSimulationStateUpdateEvents()
 
         then:
-        assert gameEventList.size() == 1
-
-        and:
         SimulationStateUpdateEvent firstEvent = gameEventList.get(0)
         assert firstEvent.eventType == "MinigunnerCreated"
 
@@ -58,17 +64,13 @@ class MiscTests extends Specification {
 
         gameClient.moveUnit(createdMinigunner.id, destinationMinigunnerXInWorldCoordinates, destinationMinigunnerYInWorldCoordinates )
 
+        then:
+        assertNumberOfSimulationStateUpdateEvents(2)
 
-        and:
-        sleep(5000)
-
-        and:
+        when:
         gameEventList = gameClient.getSimulationStateUpdateEvents()
 
-
         then:
-        assert gameEventList.size() == 2
-
         SimulationStateUpdateEvent secondEvent = gameEventList.get(1)
         assert secondEvent.eventType == "UnitOrderedToMove"
 
@@ -78,17 +80,13 @@ class MiscTests extends Specification {
         assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
         assert secondEventDataAsObject.ID == 1
 
+        then:
+        assertNumberOfSimulationStateUpdateEvents(3)
 
         when:
-        sleep(50000)
-
-        and:
         gameEventList = gameClient.getSimulationStateUpdateEvents()
 
-
         then:
-        assert gameEventList.size() == 3
-
         SimulationStateUpdateEvent thirdEvent = gameEventList.get(2)
         assert thirdEvent.eventType == "UnitArrivedAtDestination"
 
@@ -99,12 +97,20 @@ class MiscTests extends Specification {
         assert thirdEventDataAsObject.ID == 1
 
 
-//        Add validation here that minigunner arrived at destination
-//        By checking events
-//        but in polling loop to wait for proper events
-
     }
 
+
+    def assertNumberOfSimulationStateUpdateEvents(int numEventsToAssert) {
+        int timeoutInSeconds = 60
+        List<SimulationStateUpdateEvent>  gameEventList
+        def conditions = new PollingConditions(timeout: timeoutInSeconds, initialDelay: 1.5, factor: 1.25)
+        conditions.eventually {
+            gameEventList = gameClient.getSimulationStateUpdateEvents()
+            assert gameEventList.size() == numEventsToAssert
+        }
+        return true
+
+    }
 
 
 }
