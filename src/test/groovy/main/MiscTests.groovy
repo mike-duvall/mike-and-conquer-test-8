@@ -65,7 +65,8 @@ class MiscTests extends Specification {
         gameClient.moveUnit(createdMinigunner.id, destinationMinigunnerXInWorldCoordinates, destinationMinigunnerYInWorldCoordinates )
 
         then:
-        assertNumberOfSimulationStateUpdateEvents(2)
+//        assertNumberOfSimulationStateUpdateEvents(2)
+        assertNumberOfSimulationStateUpdateEvents(469)
 
         when:
         gameEventList = gameClient.getSimulationStateUpdateEvents()
@@ -81,13 +82,15 @@ class MiscTests extends Specification {
         assert secondEventDataAsObject.ID == 1
 
         then:
-        assertNumberOfSimulationStateUpdateEvents(3)
+//        assertNumberOfSimulationStateUpdateEvents(3)
+        assertNumberOfSimulationStateUpdateEvents(469)
 
         when:
         gameEventList = gameClient.getSimulationStateUpdateEvents()
 
         then:
-        SimulationStateUpdateEvent thirdEvent = gameEventList.get(2)
+//        SimulationStateUpdateEvent thirdEvent = gameEventList.get(2)
+        SimulationStateUpdateEvent thirdEvent = gameEventList.get(468)
         assert thirdEvent.eventType == "UnitArrivedAtDestination"
 
         def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
