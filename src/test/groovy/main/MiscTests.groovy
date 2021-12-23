@@ -16,13 +16,14 @@ class MiscTests extends Specification {
 
     def setup() {
         String localhost = "localhost"
-        String remoteHost = "192.168.0.147"
-        String host = localhost
-//        String host = remoteHost
+        String remoteHost = "192.168.0.186"
+
+//        String host = localhost
+        String host = remoteHost
 
         int port = 5000
-//        boolean useTimeouts = true
-        boolean useTimeouts = false
+        boolean useTimeouts = true
+//        boolean useTimeouts = false
         gameClient = new MikeAndConquerGameClient(host, port, useTimeouts )
 
 
@@ -41,14 +42,14 @@ class MiscTests extends Specification {
         Minigunner createdMinigunner = gameClient.addGDIMinigunnerAtWorldCoordinates(minigunnerXInWorldCoordinates, minigunnerYInWorldCoordinates)
 
         then:
-        assertNumberOfSimulationStateUpdateEvents(1)
+        assertNumberOfSimulationStateUpdateEvents(2)
 
 
         when:
         gameEventList = gameClient.getSimulationStateUpdateEvents()
 
         then:
-        SimulationStateUpdateEvent firstEvent = gameEventList.get(0)
+        SimulationStateUpdateEvent firstEvent = gameEventList.get(1)
         assert firstEvent.eventType == "MinigunnerCreated"
 
         def jsonSlurper = new JsonSlurper()
@@ -66,13 +67,13 @@ class MiscTests extends Specification {
 
         then:
 //        assertNumberOfSimulationStateUpdateEvents(2)
-        assertNumberOfSimulationStateUpdateEvents(469)
+        assertNumberOfSimulationStateUpdateEvents(470)
 
         when:
         gameEventList = gameClient.getSimulationStateUpdateEvents()
 
         then:
-        SimulationStateUpdateEvent secondEvent = gameEventList.get(1)
+        SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
         assert secondEvent.eventType == "UnitOrderedToMove"
 
         def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
@@ -83,14 +84,14 @@ class MiscTests extends Specification {
 
         then:
 //        assertNumberOfSimulationStateUpdateEvents(3)
-        assertNumberOfSimulationStateUpdateEvents(469)
+        assertNumberOfSimulationStateUpdateEvents(470)
 
         when:
         gameEventList = gameClient.getSimulationStateUpdateEvents()
 
         then:
 //        SimulationStateUpdateEvent thirdEvent = gameEventList.get(2)
-        SimulationStateUpdateEvent thirdEvent = gameEventList.get(468)
+        SimulationStateUpdateEvent thirdEvent = gameEventList.get(469)
         assert thirdEvent.eventType == "UnitArrivedAtDestination"
 
         def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
@@ -104,7 +105,7 @@ class MiscTests extends Specification {
 
 
     def assertNumberOfSimulationStateUpdateEvents(int numEventsToAssert) {
-        int timeoutInSeconds = 60
+        int timeoutInSeconds = 30
         List<SimulationStateUpdateEvent>  gameEventList
         def conditions = new PollingConditions(timeout: timeoutInSeconds, initialDelay: 1.5, factor: 1.25)
         conditions.eventually {
