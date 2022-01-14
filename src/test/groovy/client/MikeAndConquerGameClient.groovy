@@ -2,7 +2,7 @@ package client
 
 import domain.*
 import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
+import groovyx.net.http.HttpResponseException
 import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
@@ -33,6 +33,66 @@ class MikeAndConquerGameClient {
         }
     }
 
+
+
+    void setGameOptions(SimulationOptions simulationOptions) {
+//        def resp = restClient.post(
+//                path: GAME_OPTIONS_URL,
+//                body: resetOptions,
+//                requestContentType: 'application/json' )
+//
+//        assert resp.status == 204
+
+
+        SetOptionsUserCommand command = new SetOptionsUserCommand()
+        command.commandType = "SetOptions"
+//        command.unitId = unitId
+
+        def commandParams =
+                [
+                    gameSpeed: simulationOptions.gameSpeed
+                ]
+
+        command.commandData =  JsonOutput.toJson(commandParams)
+
+
+        def resp = restClient.post(
+                path: '/simulation/command/user',
+                body: command,
+                requestContentType: 'application/json')
+
+        assert resp.status == 200
+
+
+    }
+
+
+    SimulationOptions getGameOptions() {
+
+        def resp
+        try {
+            resp = restClient.get(path: GAME_OPTIONS_URL)
+        }
+        catch(HttpResponseException e) {
+            if(e.statusCode == 404) {
+                return null
+            }
+            else {
+                throw e
+            }
+        }
+        if( resp.status == 404) {
+            return null
+        }
+        assert resp.status == 200  // HTTP response code; 404 means not found, etc.
+
+        SimulationOptions resetOptions = new SimulationOptions()
+        resetOptions.drawShroud = resp.responseData.drawShroud
+        resetOptions.initialMapZoom = resp.responseData.initialMapZoom
+        resetOptions.gameSpeed = resp.responseData.gameSpeed
+        return resetOptions
+
+    }
 
 
 
@@ -88,6 +148,36 @@ class MikeAndConquerGameClient {
 
     }
 
+    void resetScenario() {
+
+        ResetScenarioCommand command = new ResetScenarioCommand()
+        command.commandType = "ResetScenario"
+
+//        def commandParams =
+//                [
+//                        startLocationXInWorldCoordinates: minigunnerX,
+//                        startLocationYInWorldCoordinates: minigunnerY
+//                ]
+//
+//        command.commandData =  JsonOutput.toJson(commandParams)
+
+        def resp = restClient.post(
+                path: '/simulation/command/admin',
+                body: command,
+                requestContentType: 'application/json')
+
+
+        assert resp.status == 200
+
+//        Minigunner minigunner = new Minigunner()
+//        minigunner.id = resp.responseData.id
+//        minigunner.x = resp.responseData.x
+//        minigunner.y = resp.responseData.y
+//        return minigunner
+
+    }
+
+
 
 
     Minigunner addGDIMinigunnerAtWorldCoordinates(int minigunnerX, int minigunnerY) {
@@ -127,20 +217,6 @@ class MikeAndConquerGameClient {
             SimulationStateUpdateEvent simulationStateUpdateEvent = new SimulationStateUpdateEvent()
             simulationStateUpdateEvent.eventType = resp.responseData[i].eventType
             simulationStateUpdateEvent.eventData = resp.responseData[i].eventData
-
-//            String eventDataAsJsonString = resp.responseData[i].eventData
-//            def jsonSlurper = new JsonSlurper()
-//            def eventDataAsObject = jsonSlurper.parseText(eventDataAsJsonString)
-//
-//            simulationStateUpdateEvent.X = eventDataAsObject.X
-//            simulationStateUpdateEvent.Y = eventDataAsObject.Y
-//            simulationStateUpdateEvent.ID = eventDataAsObject.ID
-
-//            simulationStateUpdateEvent.X = resp.responseData[i].eventData['x']
-//            simulationStateUpdateEvent.Y = resp.responseData[i].eventData['y']
-//            simulationStateUpdateEvent.ID = resp.responseData[i].eventData['id']
-
-
             allSimulationStateUpdateEvents.add(simulationStateUpdateEvent)
         }
         return allSimulationStateUpdateEvents
