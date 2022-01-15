@@ -116,7 +116,7 @@ class MikeAndConquerGameClient {
 //        return minigunner
 //    }
 
-    Minigunner addMinigunnerAtWorldCoordinates(String baseUrl, int minigunnerX, int minigunnerY, boolean aiIsOn) {
+    void addMinigunnerAtWorldCoordinates(String baseUrl, int minigunnerX, int minigunnerY, boolean aiIsOn) {
         Minigunner inputMinigunner = new Minigunner()
         inputMinigunner.x = minigunnerX
         inputMinigunner.y = minigunnerY
@@ -138,13 +138,13 @@ class MikeAndConquerGameClient {
                 requestContentType: 'application/json')
 
 
-        assert resp.status == 201
+        assert resp.status == 200
 
-        Minigunner minigunner = new Minigunner()
-        minigunner.id = resp.responseData.id
-        minigunner.x = resp.responseData.x
-        minigunner.y = resp.responseData.y
-        return minigunner
+//        Minigunner minigunner = new Minigunner()
+//        minigunner.id = resp.responseData.id
+//        minigunner.x = resp.responseData.x
+//        minigunner.y = resp.responseData.y
+//        return minigunner
 
     }
 
