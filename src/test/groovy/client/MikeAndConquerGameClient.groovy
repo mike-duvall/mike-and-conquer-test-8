@@ -2,7 +2,6 @@ package client
 
 import domain.*
 import groovy.json.JsonOutput
-import groovy.json.JsonParser
 import groovy.json.JsonSlurper
 import groovyx.net.http.HttpResponseException
 import groovyx.net.http.RESTClient
@@ -98,29 +97,6 @@ class MikeAndConquerGameClient {
 
 
 
-//    Minigunner addMinigunnerAtWorldCoordinates(String baseUrl, int minigunnerX, int minigunnerY, boolean aiIsOn) {
-//        Minigunner inputMinigunner = new Minigunner()
-//        inputMinigunner.x = minigunnerX
-//        inputMinigunner.y = minigunnerY
-//        inputMinigunner.aiIsOn = aiIsOn
-//        def resp = restClient.post(
-//                path: baseUrl,
-//                body:   inputMinigunner ,
-//                requestContentType: 'application/json' )
-//
-//        assert resp.status == 200
-//
-//        Minigunner minigunner = new Minigunner()
-//        minigunner.id = resp.responseData.id
-//        minigunner.x = resp.responseData.x
-//        minigunner.y = resp.responseData.y
-//        minigunner.health = resp.responseData.health
-//        return minigunner
-//    }
-
-
-
-
 
     void addMinigunnerAtWorldCoordinates(String baseUrl, int minigunnerX, int minigunnerY, boolean aiIsOn) {
         Minigunner inputMinigunner = new Minigunner()
@@ -143,29 +119,19 @@ class MikeAndConquerGameClient {
                 body: createUnitCommand,
                 requestContentType: 'application/json')
 
-
         assert resp.status == 200
-
-//        Minigunner minigunner = new Minigunner()
-//        minigunner.id = resp.responseData.id
-//        minigunner.x = resp.responseData.x
-//        minigunner.y = resp.responseData.y
-//        return minigunner
 
     }
 
-    void addJeepAtWorldCoordinates( int minigunnerX, int minigunnerY) {
-        Minigunner inputMinigunner = new Minigunner()
-        inputMinigunner.x = minigunnerX
-        inputMinigunner.y = minigunnerY
+    void addJeepAtWorldCoordinates( int x, int y) {
 
         CreateJeepCommand command = new CreateJeepCommand()
         command.commandType = "CreateJeep"
 
         def commandParams =
                 [
-                        startLocationXInWorldCoordinates: minigunnerX,
-                        startLocationYInWorldCoordinates: minigunnerY
+                        startLocationXInWorldCoordinates: x,
+                        startLocationYInWorldCoordinates: y
                 ]
 
         command.commandData =  JsonOutput.toJson(commandParams)
@@ -179,7 +145,6 @@ class MikeAndConquerGameClient {
             assert resp.status == 200
         }
         catch(HttpResponseException e) {
-//            int x = 3
             ByteArrayInputStream byteArrayInputStream = e.response.responseData
             int n = byteArrayInputStream.available()
             byte[] bytes = new byte[n]
@@ -236,14 +201,6 @@ class MikeAndConquerGameClient {
         ResetScenarioCommand command = new ResetScenarioCommand()
         command.commandType = "ResetScenario"
 
-//        def commandParams =
-//                [
-//                        startLocationXInWorldCoordinates: minigunnerX,
-//                        startLocationYInWorldCoordinates: minigunnerY
-//                ]
-//
-//        command.commandData =  JsonOutput.toJson(commandParams)
-
         try {
             def resp = restClient.post(
                     path: '/simulation/command',
@@ -256,12 +213,6 @@ class MikeAndConquerGameClient {
         catch(HttpResponseException e) {
             int x = 3
         }
-
-//        Minigunner minigunner = new Minigunner()
-//        minigunner.id = resp.responseData.id
-//        minigunner.x = resp.responseData.x
-//        minigunner.y = resp.responseData.y
-//        return minigunner
 
     }
 
@@ -317,7 +268,6 @@ class MikeAndConquerGameClient {
 
         MoveUnitCommand command = new MoveUnitCommand()
         command.commandType = "OrderUnitMove"
-//        command.unitId = unitId
 
         def commandParams =
                 [
