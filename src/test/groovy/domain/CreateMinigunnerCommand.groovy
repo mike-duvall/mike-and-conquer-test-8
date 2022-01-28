@@ -1,6 +1,6 @@
 package domain
 
-class CreateUnitCommand {
+class CreateMinigunnerCommand {
 
     String commandType
     String commandData

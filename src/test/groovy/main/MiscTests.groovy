@@ -69,45 +69,56 @@ class MiscTests extends Specification {
 
 
 
-    def "Add minigunner and move across screen"() {
+    @Unroll
+    def "Assert Jeep travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
         given:
 
-        int minigunnerXInWorldCoordinates = 60
-        int minigunnerYInWorldCoordinates = 40
+        int startXInWorldCoordinates = 12
+        int startYInWorldCoordinates = 12
         List<SimulationStateUpdateEvent>  gameEventList = null
-
+        def jsonSlurper = new JsonSlurper()
+        long startingTick = -1
+        long endingTick = -1
+        int expectedTotalEvents = 123
+        SimulationOptions simulationOptions = new SimulationOptions()
+        simulationOptions.gameSpeed = gameSpeed
+        gameClient.setGameOptions(simulationOptions)
 
         when:
-//        gameClient.addGDIMinigunnerAtMapSquare(2,3)
-        Minigunner createdMinigunner = gameClient.addGDIMinigunnerAtWorldCoordinates(minigunnerXInWorldCoordinates, minigunnerYInWorldCoordinates)
+        gameClient.addJeepAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
 
         then:
         assertNumberOfSimulationStateUpdateEvents(2)
 
-
         when:
-        gameEventList = gameClient.getSimulationStateUpdateEvents()
+        gameEventList = gameClient.getSimulationStateUpdateEvents();
+        SimulationStateUpdateEvent unitCreatedEvent = gameEventList.get(1)
 
         then:
-        SimulationStateUpdateEvent firstEvent = gameEventList.get(1)
-        assert firstEvent.eventType == "MinigunnerCreated"
-
-        def jsonSlurper = new JsonSlurper()
-        def eventDataAsObject = jsonSlurper.parseText(firstEvent.eventData)
-
-        assert eventDataAsObject.X == minigunnerXInWorldCoordinates
-        assert eventDataAsObject.Y == minigunnerYInWorldCoordinates
-        assert eventDataAsObject.ID == 1
+        assert unitCreatedEvent.eventType == "JeepCreated"
 
         when:
-        int destinationMinigunnerXInWorldCoordinates = 100
-        int destinationMinigunnerYInWorldCoordinates = 110
-
-        gameClient.moveUnit(createdMinigunner.id, destinationMinigunnerXInWorldCoordinates, destinationMinigunnerYInWorldCoordinates )
+        def unitDataObject = jsonSlurper.parseText(unitCreatedEvent.eventData)
+        Unit createdUnit = new Unit()
+        createdUnit.id = unitDataObject.ID
+        createdUnit.x = unitDataObject.X
+        createdUnit.y = unitDataObject.Y
 
         then:
-//        assertNumberOfSimulationStateUpdateEvents(2)
-        assertNumberOfSimulationStateUpdateEvents(470)
+        assert createdUnit.id == 1
+        assert createdUnit.x == startXInWorldCoordinates
+        assert createdUnit.x == startYInWorldCoordinates
+
+        when:
+        int destinationXInWorldCoordinates = 360 - 12
+        int destinationYInWorldCoordinates = 12
+
+        gameClient.moveUnit(createdUnit.id, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
+
+        sleep (expectedTimeInMillis - 10000)
+
+        then:
+        assertNumberOfSimulationStateUpdateEvents(expectedTotalEvents)
 
         when:
         gameEventList = gameClient.getSimulationStateUpdateEvents()
@@ -118,101 +129,17 @@ class MiscTests extends Specification {
 
         def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
 
-        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationMinigunnerXInWorldCoordinates
-        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
+        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
+        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
         assert secondEventDataAsObject.ID == 1
-
-        then:
-//        assertNumberOfSimulationStateUpdateEvents(3)
-        assertNumberOfSimulationStateUpdateEvents(470)
-
-        when:
-        gameEventList = gameClient.getSimulationStateUpdateEvents()
-
-        then:
-//        SimulationStateUpdateEvent thirdEvent = gameEventList.get(2)
-        SimulationStateUpdateEvent thirdEvent = gameEventList.get(469)
-        assert thirdEvent.eventType == "UnitArrivedAtDestination"
-
-        def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
-
-        assert thirdEventDataAsObject.XInWorldCoordinates == destinationMinigunnerXInWorldCoordinates
-        assert thirdEventDataAsObject.YInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
-        assert thirdEventDataAsObject.ID == 1
-
-
-    }
-
-
-
-    @Unroll
-    def "Assert Jeep travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
-        // This test presumes a minigunner is set to run at Jeep speed,
-        // which is MPH_MEDIUM_FAST=30, which is 30 leptons per time loop
-
-        given:
-
-        int minigunnerXInWorldCoordinates = 12
-        int minigunnerYInWorldCoordinates = 12
-        List<SimulationStateUpdateEvent>  gameEventList = null
-        def jsonSlurper = new JsonSlurper()
-        long startingTick = -1
-        long endingTick = -1
-        int expectedTotalEvents = 122
-//        int expectedTimeInMillis = 2855
-        SimulationOptions simulationOptions = new SimulationOptions()
-        simulationOptions.gameSpeed = gameSpeed
-        gameClient.setGameOptions(simulationOptions)
-
-
-
-        when:
-//        gameClient.addGDIMinigunnerAtMapSquare(2,3)
-        Minigunner createdMinigunner = gameClient.addGDIMinigunnerAtWorldCoordinates(minigunnerXInWorldCoordinates, minigunnerYInWorldCoordinates)
-
-        then:
-        assertNumberOfSimulationStateUpdateEvents(1)
-
-        when:
-
-        when:
-        int destinationMinigunnerXInWorldCoordinates = 360 - 12
-        int destinationMinigunnerYInWorldCoordinates = 12
-
-        gameClient.moveUnit(createdMinigunner.id, destinationMinigunnerXInWorldCoordinates, destinationMinigunnerYInWorldCoordinates )
-
-        sleep (expectedTimeInMillis - 10000)
-
-        then:
-        assertNumberOfSimulationStateUpdateEvents(expectedTotalEvents)
-
-        when:
-        gameEventList = gameClient.getSimulationStateUpdateEvents()
-
-
-        then:
-        SimulationStateUpdateEvent secondEvent = gameEventList.get(1)
-        assert secondEvent.eventType == "UnitOrderedToMove"
-
-        def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
-
-        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationMinigunnerXInWorldCoordinates
-        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
-        assert secondEventDataAsObject.ID == 1
-
 
         when:
         startingTick = secondEventDataAsObject.Timestamp
 
         then:
-//        SimulationStateUpdateEvent thirdEvent = gameEventList.get(2)
         SimulationStateUpdateEvent thirdEvent = gameEventList.get(expectedTotalEvents - 1)
         assert thirdEvent.eventType == "UnitArrivedAtDestination"
-
         def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
-
-//        assert thirdEventDataAsObject.XInWorldCoordinates == destinationMinigunnerXInWorldCoordinates
-//        assert thirdEventDataAsObject.YInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
         assert thirdEventDataAsObject.ID == 1
 
         when:
@@ -222,55 +149,63 @@ class MiscTests extends Specification {
         int totalTime = endingMilliseconds - startingMilliseconds
         println("totalTime was:" + totalTime)
 
-
         then:
         assert totalTime < expectedTimeInMillis + 200
         assert totalTime > expectedTimeInMillis - 200
-
 
         where:
         expectedTimeInMillis   | gameSpeed
         2855                   | "Fastest"
-        30236                  | "Slowest"
         5040                   | "Normal"
+        30236                  | "Slowest"
     }
-
 
     @Unroll
     def "Assert MCV travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
-        // This test presumes a minigunner is set to run at Jeep speed,
-        // which is MPH_MEDIUM_FAST=30, which is 30 leptons per time loop
 
         given:
-
-        int minigunnerXInWorldCoordinates = 12
-        int minigunnerYInWorldCoordinates = 12
+        int startXInWorldCoordinates = 12
+        int startYInWorldCoordinates = 12
         List<SimulationStateUpdateEvent>  gameEventList = null
         def jsonSlurper = new JsonSlurper()
         long startingTick = -1
         long endingTick = -1
-        int expectedTotalEvents = 301
-//        int expectedTimeInMillis = 2855
+        int expectedTotalEvents = 302
         SimulationOptions simulationOptions = new SimulationOptions()
         simulationOptions.gameSpeed = gameSpeed
         gameClient.setGameOptions(simulationOptions)
 
-
-
         when:
-//        gameClient.addGDIMinigunnerAtMapSquare(2,3)
-        Minigunner createdMinigunner = gameClient.addGDIMinigunnerAtWorldCoordinates(minigunnerXInWorldCoordinates, minigunnerYInWorldCoordinates)
+        gameClient.addMCVAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
+
 
         then:
-        assertNumberOfSimulationStateUpdateEvents(1)
+        assertNumberOfSimulationStateUpdateEvents(2)
 
         when:
+        gameEventList = gameClient.getSimulationStateUpdateEvents();
+        SimulationStateUpdateEvent unitCreatedEvent = gameEventList.get(1)
+
+        then:
+        assert unitCreatedEvent.eventType == "MCVCreated"
 
         when:
-        int destinationMinigunnerXInWorldCoordinates = 360 - 12
-        int destinationMinigunnerYInWorldCoordinates = 12
+        def UnitDataObject = jsonSlurper.parseText(unitCreatedEvent.eventData)
+        Unit createdUnit = new Unit()
+        createdUnit.id = UnitDataObject.ID
+        createdUnit.x = UnitDataObject.X
+        createdUnit.y = UnitDataObject.Y
 
-        gameClient.moveUnit(createdMinigunner.id, destinationMinigunnerXInWorldCoordinates, destinationMinigunnerYInWorldCoordinates )
+        then:
+        assert createdUnit.id == 1
+        assert createdUnit.x == startXInWorldCoordinates
+        assert createdUnit.x == startYInWorldCoordinates
+
+        when:
+        int destinationXInWorldCoordinates = 360 - 12
+        int destinationYInWorldCoordinates = 12
+
+        gameClient.moveUnit(createdUnit.id, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
 
         sleep (expectedTimeInMillis - 10000)
 
@@ -280,30 +215,23 @@ class MiscTests extends Specification {
         when:
         gameEventList = gameClient.getSimulationStateUpdateEvents()
 
-
         then:
-        SimulationStateUpdateEvent secondEvent = gameEventList.get(1)
+        SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
         assert secondEvent.eventType == "UnitOrderedToMove"
 
         def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
 
-        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationMinigunnerXInWorldCoordinates
-        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
+        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
+        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
         assert secondEventDataAsObject.ID == 1
-
 
         when:
         startingTick = secondEventDataAsObject.Timestamp
 
         then:
-//        SimulationStateUpdateEvent thirdEvent = gameEventList.get(2)
         SimulationStateUpdateEvent thirdEvent = gameEventList.get(expectedTotalEvents - 1)
         assert thirdEvent.eventType == "UnitArrivedAtDestination"
-
         def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
-
-//        assert thirdEventDataAsObject.XInWorldCoordinates == destinationMinigunnerXInWorldCoordinates
-//        assert thirdEventDataAsObject.YInWorldCoordinates == destinationMinigunnerYInWorldCoordinates
         assert thirdEventDataAsObject.ID == 1
 
         when:
@@ -313,24 +241,16 @@ class MiscTests extends Specification {
         int totalTime = endingMilliseconds - startingMilliseconds
         println("totalTime was:" + totalTime)
 
-
         then:
         assert totalTime < expectedTimeInMillis + 200
         assert totalTime > expectedTimeInMillis - 200
-
 
         where:
         expectedTimeInMillis   | gameSpeed
         7139                   | "Fastest"
         75597                  | "Slowest"
-        12601                   | "Normal"
+        12601                  | "Normal"
     }
-
-
-
-
-
-
 
 
 

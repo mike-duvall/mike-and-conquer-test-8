@@ -1,6 +1,6 @@
 package domain
 
-class Minigunner {
+class Unit {
 
     int id
     int x
