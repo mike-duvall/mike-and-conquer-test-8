@@ -99,7 +99,7 @@ class MikeAndConquerGameClient {
 
 
     void addMinigunnerAtWorldCoordinates(String baseUrl, int minigunnerX, int minigunnerY, boolean aiIsOn) {
-        Minigunner inputMinigunner = new Minigunner()
+        Unit inputMinigunner = new Unit()
         inputMinigunner.x = minigunnerX
         inputMinigunner.y = minigunnerY
 
@@ -158,7 +158,7 @@ class MikeAndConquerGameClient {
     }
 
     void addMCVAtWorldCoordinates( int minigunnerX, int minigunnerY) {
-        Minigunner inputMinigunner = new Minigunner()
+        Unit inputMinigunner = new Unit()
         inputMinigunner.x = minigunnerX
         inputMinigunner.y = minigunnerY
 
@@ -219,13 +219,13 @@ class MikeAndConquerGameClient {
 
 
 
-    Minigunner addGDIMinigunnerAtWorldCoordinates(int minigunnerX, int minigunnerY) {
+    Unit addGDIMinigunnerAtWorldCoordinates(int minigunnerX, int minigunnerY) {
         boolean aiIsOn = false
         return addMinigunnerAtWorldCoordinates(GDI_MINIGUNNERS_BASE_URL, minigunnerX, minigunnerY, aiIsOn)
     }
 
 
-    Minigunner addGDIMinigunnerAtMapSquare(int x, int y) {
+    Unit addGDIMinigunnerAtMapSquare(int x, int y) {
         int halfMapSquareWidth = Util.mapSquareWidth / 2
         int worldX = (x * Util.mapSquareWidth) + halfMapSquareWidth
         int worldY = (y * Util.mapSquareWidth) + halfMapSquareWidth
