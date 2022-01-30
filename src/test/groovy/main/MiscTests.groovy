@@ -155,9 +155,14 @@ class MiscTests extends Specification {
 
         where:
         expectedTimeInMillis   | gameSpeed
-        2855                   | "Fastest"
+        30236                   | "Slowest"
+        15120                   | "Slower"
+        10082                   | "Slow"
+        7560                   | "Moderate"
         5040                   | "Normal"
-        30236                  | "Slowest"
+        3697                    | "Fast"
+        3024                    | "Faster"
+        2855                    | "Fastest"
     }
 
     @Unroll
@@ -246,10 +251,17 @@ class MiscTests extends Specification {
         assert totalTime > expectedTimeInMillis - 200
 
         where:
-        expectedTimeInMillis   | gameSpeed
-        7139                   | "Fastest"
-        75597                  | "Slowest"
-        12601                  | "Normal"
+        expectedTimeInMillis    | gameSpeed
+        75597                   | "Slowest"
+        37801                   | "Slower"
+        25201                   | "Slow"
+        18900                   | "Moderate"
+        12601                   | "Normal"
+        9240                    | "Fast"
+        7560                    | "Faster"
+        7139                    | "Fastest"
+
+
     }
 
 
