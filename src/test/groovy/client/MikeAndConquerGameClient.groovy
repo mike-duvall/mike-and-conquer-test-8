@@ -212,7 +212,10 @@ class MikeAndConquerGameClient {
         }
         catch(HttpResponseException e) {
             int x = 3
+            throw e
         }
+
+        int y = 4
 
     }
 
