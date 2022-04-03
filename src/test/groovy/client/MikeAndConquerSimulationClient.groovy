@@ -8,7 +8,7 @@ import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
 
-class MikeAndConquerGameClient {
+class MikeAndConquerSimulationClient {
 
 
     String hostUrl
@@ -24,7 +24,7 @@ class MikeAndConquerGameClient {
     private static final String GAME_HISTORY_EVENTS_URL = '/mac/gameHistoryEvents'
 
 
-    MikeAndConquerGameClient(String host, int port, boolean useTimeouts = true) {
+    MikeAndConquerSimulationClient(String host, int port, boolean useTimeouts = true) {
         hostUrl = "http://$host:$port"
         restClient = new RESTClient(hostUrl)
 
@@ -92,6 +92,30 @@ class MikeAndConquerGameClient {
         resetOptions.initialMapZoom = resp.responseData.initialMapZoom
         resetOptions.gameSpeed = resp.responseData.gameSpeed
         return resetOptions
+
+    }
+
+
+    void startScenario() {
+
+        StartScenarioCommand command = new StartScenarioCommand()
+        command.commandType = "StartScenario"
+
+        try {
+            def resp = restClient.post(
+                    path: '/simulation/command',
+                    body: command,
+                    requestContentType: 'application/json')
+
+
+            assert resp.status == 200
+        }
+        catch(HttpResponseException e) {
+            int x = 3
+            throw e
+        }
+
+        int y = 4
 
     }
 

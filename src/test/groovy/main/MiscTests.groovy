@@ -1,6 +1,6 @@
 package main
 
-import client.MikeAndConquerGameClient
+import client.MikeAndConquerSimulationClient
 import domain.*
 import groovy.json.JsonSlurper
 import spock.lang.Specification
@@ -11,7 +11,7 @@ import spock.util.concurrent.PollingConditions
 class MiscTests extends Specification {
 
 
-    MikeAndConquerGameClient gameClient
+    MikeAndConquerSimulationClient simulationClient
 
 
     enum GameSpeed
@@ -30,14 +30,14 @@ class MiscTests extends Specification {
 
     protected void setAndAssertGameOptions(GameSpeed gameSpeed) {
         SimulationOptions gameOptions = new SimulationOptions( gameSpeed.name())
-        gameClient.setGameOptions(gameOptions)
+        simulationClient.setGameOptions(gameOptions)
         assertGameOptionsAreSetTo(gameOptions)
     }
 
     def assertGameOptionsAreSetTo(SimulationOptions desiredGameOptions) {
         def conditions = new PollingConditions(timeout: 70, initialDelay: 1.5, factor: 1.25)
         conditions.eventually {
-            SimulationOptions resetOptions1 = gameClient.getGameOptions()
+            SimulationOptions resetOptions1 = simulationClient.getGameOptions()
             assert resetOptions1.gameSpeed == desiredGameOptions.gameSpeed
             assert resetOptions1.initialMapZoom == desiredGameOptions.initialMapZoom
             assert resetOptions1.drawShroud == desiredGameOptions.drawShroud
@@ -58,9 +58,10 @@ class MiscTests extends Specification {
         int port = 5000
         boolean useTimeouts = true
 //        boolean useTimeouts = false
-        gameClient = new MikeAndConquerGameClient(host, port, useTimeouts )
+        simulationClient = new MikeAndConquerSimulationClient(host, port, useTimeouts )
 
-        gameClient.resetScenario()
+//        simulationClient.resetScenario()
+        simulationClient.startScenario()
         sleep(1000)
 
 
@@ -82,17 +83,17 @@ class MiscTests extends Specification {
         int expectedTotalEvents = 123
         SimulationOptions simulationOptions = new SimulationOptions()
         simulationOptions.gameSpeed = gameSpeed
-        gameClient.setGameOptions(simulationOptions)
+        simulationClient.setGameOptions(simulationOptions)
         int allowedDelta = 250
 
         when:
-        gameClient.addJeepAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
+        simulationClient.addJeepAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
 
         then:
         assertNumberOfSimulationStateUpdateEvents(2)
 
         when:
-        gameEventList = gameClient.getSimulationStateUpdateEvents();
+        gameEventList = simulationClient.getSimulationStateUpdateEvents();
         SimulationStateUpdateEvent unitCreatedEvent = gameEventList.get(1)
 
         then:
@@ -115,7 +116,7 @@ class MiscTests extends Specification {
         int destinationXInWorldCoordinates = 360 - 12
         int destinationYInWorldCoordinates = 12
 
-        gameClient.moveUnit(createdUnit.id, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
+        simulationClient.moveUnit(createdUnit.id, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
 
         sleep (expectedTimeInMillis - 10000)
 
@@ -123,7 +124,7 @@ class MiscTests extends Specification {
         assertNumberOfSimulationStateUpdateEvents(expectedTotalEvents)
 
         when:
-        gameEventList = gameClient.getSimulationStateUpdateEvents()
+        gameEventList = simulationClient.getSimulationStateUpdateEvents()
 
         then:
         SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
@@ -180,18 +181,18 @@ class MiscTests extends Specification {
         int expectedTotalEvents = 302
         SimulationOptions simulationOptions = new SimulationOptions()
         simulationOptions.gameSpeed = gameSpeed
-        gameClient.setGameOptions(simulationOptions)
+        simulationClient.setGameOptions(simulationOptions)
         int allowedDelta = 250
 
         when:
-        gameClient.addMCVAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
+        simulationClient.addMCVAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
 
 
         then:
         assertNumberOfSimulationStateUpdateEvents(2)
 
         when:
-        gameEventList = gameClient.getSimulationStateUpdateEvents();
+        gameEventList = simulationClient.getSimulationStateUpdateEvents();
         SimulationStateUpdateEvent unitCreatedEvent = gameEventList.get(1)
 
         then:
@@ -214,7 +215,7 @@ class MiscTests extends Specification {
         int destinationXInWorldCoordinates = 360 - 12
         int destinationYInWorldCoordinates = 12
 
-        gameClient.moveUnit(createdUnit.id, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
+        simulationClient.moveUnit(createdUnit.id, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
 
         sleep (expectedTimeInMillis - 10000)
 
@@ -222,7 +223,7 @@ class MiscTests extends Specification {
         assertNumberOfSimulationStateUpdateEvents(expectedTotalEvents)
 
         when:
-        gameEventList = gameClient.getSimulationStateUpdateEvents()
+        gameEventList = simulationClient.getSimulationStateUpdateEvents()
 
         then:
         SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
@@ -264,8 +265,6 @@ class MiscTests extends Specification {
         9240                    | "Fast"
         7560                    | "Faster"
         7139                    | "Fastest"
-
-
     }
 
 
@@ -275,7 +274,7 @@ class MiscTests extends Specification {
         List<SimulationStateUpdateEvent>  gameEventList
         def conditions = new PollingConditions(timeout: timeoutInSeconds, initialDelay: 1.5, factor: 1.25)
         conditions.eventually {
-            gameEventList = gameClient.getSimulationStateUpdateEvents()
+            gameEventList = simulationClient.getSimulationStateUpdateEvents()
             assert gameEventList.size() == numEventsToAssert
         }
         return true

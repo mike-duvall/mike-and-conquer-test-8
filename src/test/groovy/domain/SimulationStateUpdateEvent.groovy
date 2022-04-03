@@ -4,7 +4,8 @@ class SimulationStateUpdateEvent {
 
 //    int X
 //    int Y
-//    int ID
+
+    int ID
 
     String eventType
     String eventData
