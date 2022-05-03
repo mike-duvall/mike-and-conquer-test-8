@@ -1,6 +1,6 @@
 package main
 
-import client.MikeAndConquerGameClient
+import client.MikeAndConquerSimulationClient
 import domain.*
 import groovy.json.JsonSlurper
 import spock.lang.Specification
@@ -11,7 +11,7 @@ import spock.util.concurrent.PollingConditions
 class MiscTests extends Specification {
 
 
-    MikeAndConquerGameClient gameClient
+    MikeAndConquerSimulationClient gameClient
 
 
     enum GameSpeed
@@ -58,7 +58,7 @@ class MiscTests extends Specification {
         int port = 5000
         boolean useTimeouts = true
 //        boolean useTimeouts = false
-        gameClient = new MikeAndConquerGameClient(host, port, useTimeouts )
+        gameClient = new MikeAndConquerSimulationClient(host, port, useTimeouts )
 
         gameClient.resetScenario()
         sleep(1000)
@@ -157,14 +157,14 @@ class MiscTests extends Specification {
 
         where:
         expectedTimeInMillis   | gameSpeed
-        30236                   | "Slowest"
-        15120                   | "Slower"
-        10082                   | "Slow"
+//        30236                   | "Slowest"
+//        15120                   | "Slower"
+//        10082                   | "Slow"
         7560                   | "Moderate"
-        5040                   | "Normal"
-        3697                    | "Fast"
-        3024                    | "Faster"
-        2855                    | "Fastest"
+//        5040                   | "Normal"
+//        3697                    | "Fast"
+//        3024                    | "Faster"
+//        2855                    | "Fastest"
     }
 
     @Unroll

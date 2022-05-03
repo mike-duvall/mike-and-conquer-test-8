@@ -8,7 +8,7 @@ import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
 
-class MikeAndConquerGameClient {
+class MikeAndConquerSimulationClient {
 
 
     String hostUrl
@@ -24,7 +24,7 @@ class MikeAndConquerGameClient {
     private static final String GAME_HISTORY_EVENTS_URL = '/mac/gameHistoryEvents'
 
 
-    MikeAndConquerGameClient(String host, int port, boolean useTimeouts = true) {
+    MikeAndConquerSimulationClient(String host, int port, boolean useTimeouts = true) {
         hostUrl = "http://$host:$port"
         restClient = new RESTClient(hostUrl)
 
