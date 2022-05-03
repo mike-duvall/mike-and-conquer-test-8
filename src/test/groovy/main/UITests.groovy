@@ -8,6 +8,9 @@ import groovy.json.JsonSlurper
 import domain.SimulationStateUpdateEvent
 
 import spock.lang.Specification
+import util.Util
+
+import java.awt.Point
 
 
 class UITests extends Specification {
@@ -79,35 +82,39 @@ class UITests extends Specification {
         then:
         Unit retrievedUnit = uiClient.getUnit(minigunnerId)
         assert retrievedUnit.selected == true
-//
-//
-//        when:
-//        uiClient.leftClickInMapSquareCoordinates(18,12)
-//
-//
-//        and:
-//        sleep(5000)
-//
-//        and:
-//        List<SimulationStateUpdateEvent> gameEventList = simulationClient.getSimulationStateUpdateEvents()
-//
-//        then:
-//        SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
-//        assert secondEvent.eventType == "UnitOrderedToMove"
-//
-//        def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
-//
-//        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
-//        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
-//        assert secondEventDataAsObject.ID == createdUnitId
-//
-//        and:
-//        SimulationStateUpdateEvent thirdEvent = gameEventList.get(expectedTotalEvents - 1)
-//        assert thirdEvent.eventType == "UnitArrivedAtDestination"
-//        def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
-//        assert thirdEventDataAsObject.ID == createdUnitId
-//
-//
+
+
+        when:
+        uiClient.leftClickInMapSquareCoordinates(18,12)
+        Point destinationAsWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(18,12)
+        int destinationXInWorldCoordinates = destinationAsWorldCoordinates.x
+        int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
+
+
+        and:
+        sleep(5000)
+        int expectedTotalEvents = 46
+
+        and:
+        List<SimulationStateUpdateEvent> gameEventList = simulationClient.getSimulationStateUpdateEvents()
+
+        then:
+        SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
+        assert secondEvent.eventType == "UnitOrderedToMove"
+
+        def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
+
+        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
+        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
+        assert secondEventDataAsObject.ID == minigunnerId
+
+        and:
+        SimulationStateUpdateEvent thirdEvent = gameEventList.get(expectedTotalEvents - 1)
+        assert thirdEvent.eventType == "UnitArrivedAtDestination"
+        def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
+        assert thirdEventDataAsObject.ID == minigunnerId
+
+
 //        // and:
 //        // assert minigunner is location, in map square coordaintes
 
