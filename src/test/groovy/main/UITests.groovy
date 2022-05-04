@@ -8,6 +8,7 @@ import groovy.json.JsonSlurper
 import domain.SimulationStateUpdateEvent
 
 import spock.lang.Specification
+import util.TestUtil
 import util.Util
 
 import java.awt.Point

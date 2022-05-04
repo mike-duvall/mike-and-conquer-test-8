@@ -196,10 +196,10 @@ class MikeAndConquerSimulationClient {
     }
 
 
-    void resetScenario() {
+    void startScenario() {
 
-        ResetScenarioCommand command = new ResetScenarioCommand()
-        command.commandType = "ResetScenario"
+        StartScenarioCommand command = new StartScenarioCommand()
+        command.commandType = "StartScenario"
 
         try {
             def resp = restClient.post(
@@ -218,6 +218,29 @@ class MikeAndConquerSimulationClient {
         int y = 4
 
     }
+
+//    void resetScenario() {
+//
+//        ResetScenarioCommand command = new ResetScenarioCommand()
+//        command.commandType = "ResetScenario"
+//
+//        try {
+//            def resp = restClient.post(
+//                    path: '/simulation/command',
+//                    body: command,
+//                    requestContentType: 'application/json')
+//
+//
+//            assert resp.status == 200
+//        }
+//        catch(HttpResponseException e) {
+//            int x = 3
+//            throw e
+//        }
+//
+//        int y = 4
+//
+//    }
 
 
 

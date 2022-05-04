@@ -60,7 +60,8 @@ class MiscTests extends Specification {
 //        boolean useTimeouts = false
         gameClient = new MikeAndConquerSimulationClient(host, port, useTimeouts )
 
-        gameClient.resetScenario()
+//        gameClient.resetScenario()
+        gameClient.startScenario()
         sleep(1000)
 
 
@@ -157,14 +158,14 @@ class MiscTests extends Specification {
 
         where:
         expectedTimeInMillis   | gameSpeed
-//        30236                   | "Slowest"
-//        15120                   | "Slower"
-//        10082                   | "Slow"
+        30236                   | "Slowest"
+        15120                   | "Slower"
+        10082                   | "Slow"
         7560                   | "Moderate"
-//        5040                   | "Normal"
-//        3697                    | "Fast"
-//        3024                    | "Faster"
-//        2855                    | "Fastest"
+        5040                   | "Normal"
+        3697                    | "Fast"
+        3024                    | "Faster"
+        2855                    | "Fastest"
     }
 
     @Unroll

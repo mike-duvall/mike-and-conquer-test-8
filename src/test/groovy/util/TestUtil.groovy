@@ -1,4 +1,4 @@
-package main
+package util
 
 import client.MikeAndConquerSimulationClient
 import domain.SimulationStateUpdateEvent
