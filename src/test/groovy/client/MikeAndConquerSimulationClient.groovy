@@ -270,7 +270,7 @@ class MikeAndConquerSimulationClient {
 
     def List<SimulationStateUpdateEvent> getSimulationStateUpdateEvents() {
         def resp = restClient.get(
-                path: '/simulationStateUpdateEvents',
+                path: '/simulation/query/events',
                 requestContentType: 'application/json' )
 
         assert resp.status == 200
