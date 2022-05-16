@@ -107,7 +107,7 @@ class UITests extends Specification {
 
         assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
         assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
-        assert secondEventDataAsObject.ID == minigunnerId
+        assert secondEventDataAsObject.UnitId == minigunnerId
 
         and:
         SimulationStateUpdateEvent thirdEvent = gameEventList.get(expectedTotalEvents - 1)

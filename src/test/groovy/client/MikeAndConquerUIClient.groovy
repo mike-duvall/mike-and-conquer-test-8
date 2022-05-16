@@ -2,7 +2,6 @@ package client
 
 import domain.*
 import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
 import groovyx.net.http.HttpResponseException
 import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
@@ -251,7 +250,7 @@ class MikeAndConquerUIClient {
         int y = 4
 
         Unit unit = new Unit()
-        unit.id = resp.responseData.unitId
+        unit.unitId = resp.responseData.unitId
         unit.selected = resp.responseData.selected
 
         return unit

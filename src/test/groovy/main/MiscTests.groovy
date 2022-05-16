@@ -102,10 +102,10 @@ class MiscTests extends Specification {
         when:
         def unitDataObject = jsonSlurper.parseText(unitCreatedEvent.eventData)
         Unit createdUnit = new Unit()
-        createdUnit.id = unitDataObject.UnitId
+        createdUnit.unitId = unitDataObject.UnitId
         createdUnit.x = unitDataObject.X
         createdUnit.y = unitDataObject.Y
-        int createdUnitId = createdUnit.id
+        int createdUnitId = createdUnit.unitId
 
         then:
 //        assert createdUnit.id == 1
@@ -116,7 +116,7 @@ class MiscTests extends Specification {
         int destinationXInWorldCoordinates = 360 - 12
         int destinationYInWorldCoordinates = 12
 
-        simulationClient.moveUnit(createdUnit.id, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
+        simulationClient.moveUnit(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
 
         sleep (expectedTimeInMillis - 10000)
 
@@ -134,7 +134,7 @@ class MiscTests extends Specification {
 
         assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
         assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
-        assert secondEventDataAsObject.ID == createdUnitId
+        assert secondEventDataAsObject.UnitId == createdUnitId
 
         when:
         startingTick = secondEventDataAsObject.Timestamp
@@ -201,10 +201,10 @@ class MiscTests extends Specification {
         when:
         def UnitDataObject = jsonSlurper.parseText(unitCreatedEvent.eventData)
         Unit createdUnit = new Unit()
-        createdUnit.id = UnitDataObject.UnitId
+        createdUnit.unitId = UnitDataObject.UnitId
         createdUnit.x = UnitDataObject.X
         createdUnit.y = UnitDataObject.Y
-        int createdUnitId = createdUnit.id
+        int createdUnitId = createdUnit.unitId
 
         then:
 //        assert createdUnit.id == 1
@@ -215,7 +215,7 @@ class MiscTests extends Specification {
         int destinationXInWorldCoordinates = 360 - 12
         int destinationYInWorldCoordinates = 12
 
-        simulationClient.moveUnit(createdUnit.id, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
+        simulationClient.moveUnit(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
 
         sleep (expectedTimeInMillis - 10000)
 
@@ -233,7 +233,7 @@ class MiscTests extends Specification {
 
         assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
         assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
-        assert secondEventDataAsObject.ID == createdUnitId
+        assert secondEventDataAsObject.UnitId == createdUnitId
 
         when:
         startingTick = secondEventDataAsObject.Timestamp
