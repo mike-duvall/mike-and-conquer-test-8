@@ -38,164 +38,102 @@ class MikeAndConquerUIClient {
 
 
 
-    void setGameOptions(SimulationOptions simulationOptions) {
-//        def resp = restClient.post(
-//                path: GAME_OPTIONS_URL,
-//                body: resetOptions,
-//                requestContentType: 'application/json' )
+//    void addMinigunnerAtWorldCoordinates(String baseUrl, int minigunnerX, int minigunnerY, boolean aiIsOn) {
+//        Unit inputMinigunner = new Unit()
+//        inputMinigunner.x = minigunnerX
+//        inputMinigunner.y = minigunnerY
 //
-//        assert resp.status == 204
-
-
-        SetOptionsUserCommand command = new SetOptionsUserCommand()
-        command.commandType = "SetOptions"
-//        command.unitId = unitId
-
-        def commandParams =
-                [
-                        gameSpeed: simulationOptions.gameSpeed
-                ]
-
-        command.commandData =  JsonOutput.toJson(commandParams)
-
-
-        def resp = restClient.post(
-                path: '/simulation/command',
-                body: command,
-                requestContentType: 'application/json')
-
-        assert resp.status == 200
-
-
-    }
-
-
-    SimulationOptions getGameOptions() {
-
-        def resp
-        try {
-            resp = restClient.get(path: GAME_OPTIONS_URL)
-        }
-        catch(HttpResponseException e) {
-            if(e.statusCode == 404) {
-                return null
-            }
-            else {
-                throw e
-            }
-        }
-        if( resp.status == 404) {
-            return null
-        }
-        assert resp.status == 200  // HTTP response code; 404 means not found, etc.
-
-        SimulationOptions resetOptions = new SimulationOptions()
-        resetOptions.drawShroud = resp.responseData.drawShroud
-        resetOptions.initialMapZoom = resp.responseData.initialMapZoom
-        resetOptions.gameSpeed = resp.responseData.gameSpeed
-        return resetOptions
-
-    }
-
-
-
-
-    void addMinigunnerAtWorldCoordinates(String baseUrl, int minigunnerX, int minigunnerY, boolean aiIsOn) {
-        Unit inputMinigunner = new Unit()
-        inputMinigunner.x = minigunnerX
-        inputMinigunner.y = minigunnerY
-
-        CreateMinigunnerCommand createUnitCommand = new CreateMinigunnerCommand()
-        createUnitCommand.commandType = "CreateMinigunner"
-
-        def commandParams =
-                [
-                        startLocationXInWorldCoordinates: minigunnerX,
-                        startLocationYInWorldCoordinates: minigunnerY
-                ]
-
-        createUnitCommand.commandData =  JsonOutput.toJson(commandParams)
-
-        def resp = restClient.post(
-                path: '/simulation/command',
-                body: createUnitCommand,
-                requestContentType: 'application/json')
-
-        assert resp.status == 200
-
-    }
-
-    void addJeepAtWorldCoordinates( int x, int y) {
-
-        CreateJeepCommand command = new CreateJeepCommand()
-        command.commandType = "CreateJeep"
-
-        def commandParams =
-                [
-                        startLocationXInWorldCoordinates: x,
-                        startLocationYInWorldCoordinates: y
-                ]
-
-        command.commandData =  JsonOutput.toJson(commandParams)
-
-        try {
-            def resp = restClient.post(
-                    path: '/simulation/command',
-                    body: command,
-                    requestContentType: 'application/json')
-
-            assert resp.status == 200
-        }
-        catch(HttpResponseException e) {
-            ByteArrayInputStream byteArrayInputStream = e.response.responseData
-            int n = byteArrayInputStream.available()
-            byte[] bytes = new byte[n]
-            byteArrayInputStream.read(bytes, 0, n)
-            String s = new String(bytes )
-            println("exception details:" + s)
-            Map json = new JsonSlurper().parseText(s)
-        }
-
-
-    }
-
-    void addMCVAtWorldCoordinates( int minigunnerX, int minigunnerY) {
-        Unit inputMinigunner = new Unit()
-        inputMinigunner.x = minigunnerX
-        inputMinigunner.y = minigunnerY
-
-        CreateMCVCommand command = new CreateMCVCommand()
-        command.commandType = "CreateMCV"
-
-        def commandParams =
-                [
-                        startLocationXInWorldCoordinates: minigunnerX,
-                        startLocationYInWorldCoordinates: minigunnerY
-                ]
-
-        command.commandData =  JsonOutput.toJson(commandParams)
-
-        try {
-            def resp = restClient.post(
-                    path: '/simulation/command',
-                    body: command,
-                    requestContentType: 'application/json')
-
-            assert resp.status == 200
-        }
-        catch(HttpResponseException e) {
-//            int x = 3
-            ByteArrayInputStream byteArrayInputStream = e.response.responseData
-            int n = byteArrayInputStream.available()
-            byte[] bytes = new byte[n]
-            byteArrayInputStream.read(bytes, 0, n)
-            String s = new String(bytes )
-            println("exception details:" + s)
-            Map json = new JsonSlurper().parseText(s)
-        }
-
-
-    }
+//        CreateMinigunnerCommand createUnitCommand = new CreateMinigunnerCommand()
+//        createUnitCommand.commandType = "CreateMinigunner"
+//
+//        def commandParams =
+//                [
+//                        startLocationXInWorldCoordinates: minigunnerX,
+//                        startLocationYInWorldCoordinates: minigunnerY
+//                ]
+//
+//        createUnitCommand.commandData =  JsonOutput.toJson(commandParams)
+//
+//        def resp = restClient.post(
+//                path: '/simulation/command',
+//                body: createUnitCommand,
+//                requestContentType: 'application/json')
+//
+//        assert resp.status == 200
+//
+//    }
+//
+//    void addJeepAtWorldCoordinates( int x, int y) {
+//
+//        CreateJeepCommand command = new CreateJeepCommand()
+//        command.commandType = "CreateJeep"
+//
+//        def commandParams =
+//                [
+//                        startLocationXInWorldCoordinates: x,
+//                        startLocationYInWorldCoordinates: y
+//                ]
+//
+//        command.commandData =  JsonOutput.toJson(commandParams)
+//
+//        try {
+//            def resp = restClient.post(
+//                    path: '/simulation/command',
+//                    body: command,
+//                    requestContentType: 'application/json')
+//
+//            assert resp.status == 200
+//        }
+//        catch(HttpResponseException e) {
+//            ByteArrayInputStream byteArrayInputStream = e.response.responseData
+//            int n = byteArrayInputStream.available()
+//            byte[] bytes = new byte[n]
+//            byteArrayInputStream.read(bytes, 0, n)
+//            String s = new String(bytes )
+//            println("exception details:" + s)
+//            Map json = new JsonSlurper().parseText(s)
+//        }
+//
+//
+//    }
+//
+//    void addMCVAtWorldCoordinates( int minigunnerX, int minigunnerY) {
+//        Unit inputMinigunner = new Unit()
+//        inputMinigunner.x = minigunnerX
+//        inputMinigunner.y = minigunnerY
+//
+//        CreateMCVCommand command = new CreateMCVCommand()
+//        command.commandType = "CreateMCV"
+//
+//        def commandParams =
+//                [
+//                        startLocationXInWorldCoordinates: minigunnerX,
+//                        startLocationYInWorldCoordinates: minigunnerY
+//                ]
+//
+//        command.commandData =  JsonOutput.toJson(commandParams)
+//
+//        try {
+//            def resp = restClient.post(
+//                    path: '/simulation/command',
+//                    body: command,
+//                    requestContentType: 'application/json')
+//
+//            assert resp.status == 200
+//        }
+//        catch(HttpResponseException e) {
+////            int x = 3
+//            ByteArrayInputStream byteArrayInputStream = e.response.responseData
+//            int n = byteArrayInputStream.available()
+//            byte[] bytes = new byte[n]
+//            byteArrayInputStream.read(bytes, 0, n)
+//            String s = new String(bytes )
+//            println("exception details:" + s)
+//            Map json = new JsonSlurper().parseText(s)
+//        }
+//
+//
+//    }
 
 
     void startScenario() {
@@ -322,19 +260,19 @@ class MikeAndConquerUIClient {
 
 
 
-    Unit addGDIMinigunnerAtWorldCoordinates(int minigunnerX, int minigunnerY) {
-        boolean aiIsOn = false
-        return addMinigunnerAtWorldCoordinates(GDI_MINIGUNNERS_BASE_URL, minigunnerX, minigunnerY, aiIsOn)
-    }
+//    Unit addGDIMinigunnerAtWorldCoordinates(int minigunnerX, int minigunnerY) {
+//        boolean aiIsOn = false
+//        return addMinigunnerAtWorldCoordinates(GDI_MINIGUNNERS_BASE_URL, minigunnerX, minigunnerY, aiIsOn)
+//    }
 
 
-    Unit addGDIMinigunnerAtMapSquare(int x, int y) {
-        int halfMapSquareWidth = Util.mapSquareWidth / 2
-        int worldX = (x * Util.mapSquareWidth) + halfMapSquareWidth
-        int worldY = (y * Util.mapSquareWidth) + halfMapSquareWidth
-
-        return addGDIMinigunnerAtWorldCoordinates(worldX, worldY)
-    }
+//    Unit addGDIMinigunnerAtMapSquare(int x, int y) {
+//        int halfMapSquareWidth = Util.mapSquareWidth / 2
+//        int worldX = (x * Util.mapSquareWidth) + halfMapSquareWidth
+//        int worldY = (y * Util.mapSquareWidth) + halfMapSquareWidth
+//
+//        return addGDIMinigunnerAtWorldCoordinates(worldX, worldY)
+//    }
 
 //    Minigunner addNodMinigunnerAtMapSquare(int x, int y, boolean aiIsOn) {
 //        int halfMapSquareWidth = Util.mapSquareWidth / 2
@@ -345,51 +283,51 @@ class MikeAndConquerUIClient {
 //    }
 
 
-    def List<SimulationStateUpdateEvent> getSimulationStateUpdateEvents() {
-        def resp = restClient.get(
-                path: '/simulationStateUpdateEvents',
-                requestContentType: 'application/json' )
-
-        assert resp.status == 200
-
-        int numItems = resp.responseData.size
-
-        List<SimulationStateUpdateEvent> allSimulationStateUpdateEvents = []
-        for (int i = 0; i < numItems; i++) {
-            SimulationStateUpdateEvent simulationStateUpdateEvent = new SimulationStateUpdateEvent()
-            simulationStateUpdateEvent.eventType = resp.responseData[i].eventType
-            simulationStateUpdateEvent.eventData = resp.responseData[i].eventData
-            allSimulationStateUpdateEvents.add(simulationStateUpdateEvent)
-        }
-        return allSimulationStateUpdateEvents
-
-        //int x = 3
-
-    }
-
-    void moveUnit(int unitId, int destinationXInWorldCoordinates, int destinationYInWorldCoordinate) {
-
-        MoveUnitCommand command = new MoveUnitCommand()
-        command.commandType = "OrderUnitMove"
-
-        def commandParams =
-                [
-                        unitId: unitId,
-                        destinationLocationXInWorldCoordinates: destinationXInWorldCoordinates,
-                        destinationLocationYInWorldCoordinates: destinationYInWorldCoordinate
-                ]
-
-        command.commandData =  JsonOutput.toJson(commandParams)
-
-
-        def resp = restClient.post(
-                path: '/simulation/command',
-                body: command,
-                requestContentType: 'application/json')
-
-        assert resp.status == 200
-
-    }
+//    def List<SimulationStateUpdateEvent> getSimulationStateUpdateEvents() {
+//        def resp = restClient.get(
+//                path: '/simulationStateUpdateEvents',
+//                requestContentType: 'application/json' )
+//
+//        assert resp.status == 200
+//
+//        int numItems = resp.responseData.size
+//
+//        List<SimulationStateUpdateEvent> allSimulationStateUpdateEvents = []
+//        for (int i = 0; i < numItems; i++) {
+//            SimulationStateUpdateEvent simulationStateUpdateEvent = new SimulationStateUpdateEvent()
+//            simulationStateUpdateEvent.eventType = resp.responseData[i].eventType
+//            simulationStateUpdateEvent.eventData = resp.responseData[i].eventData
+//            allSimulationStateUpdateEvents.add(simulationStateUpdateEvent)
+//        }
+//        return allSimulationStateUpdateEvents
+//
+//        //int x = 3
+//
+//    }
+//
+//    void moveUnit(int unitId, int destinationXInWorldCoordinates, int destinationYInWorldCoordinate) {
+//
+//        MoveUnitCommand command = new MoveUnitCommand()
+//        command.commandType = "OrderUnitMove"
+//
+//        def commandParams =
+//                [
+//                        unitId: unitId,
+//                        destinationLocationXInWorldCoordinates: destinationXInWorldCoordinates,
+//                        destinationLocationYInWorldCoordinates: destinationYInWorldCoordinate
+//                ]
+//
+//        command.commandData =  JsonOutput.toJson(commandParams)
+//
+//
+//        def resp = restClient.post(
+//                path: '/simulation/command',
+//                body: command,
+//                requestContentType: 'application/json')
+//
+//        assert resp.status == 200
+//
+//    }
 
 
 }

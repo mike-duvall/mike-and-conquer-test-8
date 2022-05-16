@@ -57,7 +57,7 @@ class UITests extends Specification {
             if (event.eventType == "MinigunnerCreated") {
                 def eventData = jsonSlurper.parseText(event.eventData)
 
-                minigunnerId = eventData.ID
+                minigunnerId = eventData.UnitId
             }
         }
 
@@ -113,9 +113,14 @@ class UITests extends Specification {
         SimulationStateUpdateEvent thirdEvent = gameEventList.get(expectedTotalEvents - 1)
         assert thirdEvent.eventType == "UnitArrivedAtDestination"
         def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
-        assert thirdEventDataAsObject.ID == minigunnerId
+        assert thirdEventDataAsObject.UnitId == minigunnerId
 
 
+//        expect:
+//        true
+//
+//        where:
+//        i << (1..10)
 //        // and:
 //        // assert minigunner is location, in map square coordaintes
 
