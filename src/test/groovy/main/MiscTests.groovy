@@ -158,13 +158,13 @@ class MiscTests extends Specification {
 
         where:
         expectedTimeInMillis   | gameSpeed
-//        30236                   | "Slowest"
-//        15120                   | "Slower"
-//        10082                   | "Slow"
-//        7560                   | "Moderate"
-//        5040                   | "Normal"
-//        3697                    | "Fast"
-//        3024                    | "Faster"
+        30236                   | "Slowest"
+        15120                   | "Slower"
+        10082                   | "Slow"
+        7560                   | "Moderate"
+        5040                   | "Normal"
+        3697                    | "Fast"
+        3024                    | "Faster"
         2855                    | "Fastest"
     }
 
@@ -257,13 +257,13 @@ class MiscTests extends Specification {
 
         where:
         expectedTimeInMillis    | gameSpeed
-//        75597                   | "Slowest"
-//        37801                   | "Slower"
-//        25201                   | "Slow"
-//        18900                   | "Moderate"
-//        12601                   | "Normal"
-//        9240                    | "Fast"
-//        7560                    | "Faster"
+        75597                   | "Slowest"
+        37801                   | "Slower"
+        25201                   | "Slow"
+        18900                   | "Moderate"
+        12601                   | "Normal"
+        9240                    | "Fast"
+        7560                    | "Faster"
         7139                    | "Fastest"
 
 
