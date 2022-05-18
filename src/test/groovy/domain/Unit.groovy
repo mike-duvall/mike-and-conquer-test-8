@@ -2,7 +2,7 @@ package domain
 
 class Unit {
 
-    int id
+    int unitId
     int x
     int y
     int screenX
