@@ -219,31 +219,6 @@ class MikeAndConquerSimulationClient {
 
     }
 
-//    void resetScenario() {
-//
-//        ResetScenarioCommand command = new ResetScenarioCommand()
-//        command.commandType = "ResetScenario"
-//
-//        try {
-//            def resp = restClient.post(
-//                    path: '/simulation/command',
-//                    body: command,
-//                    requestContentType: 'application/json')
-//
-//
-//            assert resp.status == 200
-//        }
-//        catch(HttpResponseException e) {
-//            int x = 3
-//            throw e
-//        }
-//
-//        int y = 4
-//
-//    }
-
-
-
 
     Unit addGDIMinigunnerAtWorldCoordinates(int minigunnerX, int minigunnerY) {
         boolean aiIsOn = false
