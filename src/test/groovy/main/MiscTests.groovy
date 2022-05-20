@@ -6,6 +6,10 @@ import groovy.json.JsonSlurper
 import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.concurrent.PollingConditions
+import util.TestUtil
+import util.Util
+
+import java.awt.Point
 
 
 class MiscTests extends Specification {
@@ -266,6 +270,64 @@ class MiscTests extends Specification {
         7560                    | "Faster"
         7139                    | "Fastest"
 
+
+    }
+
+
+    def "Move a minigunner and assert correct path is followed"() {
+        given:
+        int minigunnerId = -1
+
+        when:
+        simulationClient.addGDIMinigunnerAtMapSquare(18,14)
+
+
+        then:
+        TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient, 2)
+
+        when:
+        minigunnerId = TestUtil.assertMinigunnerCreatedEventReceived(simulationClient)
+
+        then:
+        assert minigunnerId != -1
+
+
+        when:
+//        uiClient.selectUnit(minigunnerId)
+        Point destinationAsWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(18,12)
+
+        int destinationXInWorldCoordinates = destinationAsWorldCoordinates.x
+        int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
+
+
+        simulationClient.moveUnit(minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
+
+        and:
+        int expectedTotalEvents = 46
+
+        and:
+        TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient,expectedTotalEvents)
+
+        then:
+        List<SimulationStateUpdateEvent> gameEventList = simulationClient.getSimulationStateUpdateEvents()
+        SimulationStateUpdateEvent expectedUnitOrderedToMoveEvent = gameEventList.get(2)
+        TestUtil.assertUnitOrderedToMoveEvent(expectedUnitOrderedToMoveEvent, minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
+
+//        and:
+//         Pickup here
+//         Copy this test
+//         then add these asserts
+//         original test uses mouse clicks
+//         New test uses direct simulation commands, no mouse clicks
+//         assert "UnitPlansMovementPath" event (or something like that)
+//         assert that actual path, in the for of a list of maptiles, is the correct path
+//
+//         Then assert that the unit starts moving and passes through every map tile in the path, in order
+
+
+        and:
+        SimulationStateUpdateEvent expectedUnitArrivedAtDestinationEvent = gameEventList.get(expectedTotalEvents - 1)
+        TestUtil.assertUnitArrivedAtDestinationEvent(expectedUnitArrivedAtDestinationEvent, minigunnerId)
 
     }
 
