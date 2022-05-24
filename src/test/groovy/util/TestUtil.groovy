@@ -64,8 +64,6 @@ class TestUtil {
         assert unitOrderedToMveDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
         assert unitOrderedToMveDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
         assert unitOrderedToMveDataAsObject.UnitId == minigunnerId
-
-
     }
 
 

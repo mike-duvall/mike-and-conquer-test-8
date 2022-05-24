@@ -279,7 +279,7 @@ class MiscTests extends Specification {
         int minigunnerId = -1
 
         when:
-        simulationClient.addGDIMinigunnerAtMapSquare(18,14)
+        simulationClient.addGDIMinigunnerAtMapSquare(14,13)
 
 
         then:
@@ -294,7 +294,7 @@ class MiscTests extends Specification {
 
         when:
 //        uiClient.selectUnit(minigunnerId)
-        Point destinationAsWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(18,12)
+        Point destinationAsWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(7,15)
 
         int destinationXInWorldCoordinates = destinationAsWorldCoordinates.x
         int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
@@ -303,7 +303,7 @@ class MiscTests extends Specification {
         simulationClient.moveUnit(minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
 
         and:
-        int expectedTotalEvents = 46
+        int expectedTotalEvents = 220
 
         and:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient,expectedTotalEvents)
@@ -313,12 +313,18 @@ class MiscTests extends Specification {
         SimulationStateUpdateEvent expectedUnitOrderedToMoveEvent = gameEventList.get(2)
         TestUtil.assertUnitOrderedToMoveEvent(expectedUnitOrderedToMoveEvent, minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
 
-//        and:
-//         Pickup here
-//         Copy this test
-//         then add these asserts
-//         original test uses mouse clicks
-//         New test uses direct simulation commands, no mouse clicks
+        and:
+
+        SimulationStateUpdateEvent expectedUnitMovementPlanCreatedEvent = gameEventList.get(3)
+        assert expectedUnitMovementPlanCreatedEvent.eventType == "UnitMovementPlanCreated"
+
+        def jsonSlurper = new JsonSlurper()
+        def expectedUnitMovementPlanCreatedEventDataAsObject = jsonSlurper.parseText(expectedUnitMovementPlanCreatedEvent.eventData)
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.NumSteps == 11
+//        assert expectedUnitMovementPlanCreatedEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
+//        assert expectedUnitMovementPlanCreatedEventDataAsObject.UnitId == minigunnerId
+
 //         assert "UnitPlansMovementPath" event (or something like that)
 //         assert that actual path, in the for of a list of maptiles, is the correct path
 //
