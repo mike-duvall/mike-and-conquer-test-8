@@ -68,7 +68,7 @@ class UITests extends Specification {
         int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
 
         and:
-        int expectedTotalEvents = 46
+        int expectedTotalEvents = 48
 
         and:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient,expectedTotalEvents)
