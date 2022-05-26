@@ -322,38 +322,38 @@ class MiscTests extends Specification {
         def expectedUnitMovementPlanCreatedEventDataAsObject = jsonSlurper.parseText(expectedUnitMovementPlanCreatedEvent.eventData)
 
         assert expectedUnitMovementPlanCreatedEventDataAsObject.NumSteps == 11
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[0].X == 14
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[0].Y == 13
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[0].X == 14
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[0].Y == 13
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[1].X == 14
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[1].Y == 14
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[1].X == 14
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[1].Y == 14
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[2].X == 14
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[2].Y == 15
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[2].X == 14
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[2].Y == 15
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[3].X == 13
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[3].Y == 16
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[3].X == 13
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[3].Y == 16
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[4].X == 12
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[4].Y == 17
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[4].X == 12
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[4].Y == 17
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[5].X == 11
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[5].Y == 17
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[5].X == 11
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[5].Y == 17
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[6].X == 10
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[6].Y == 17
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[6].X == 10
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[6].Y == 17
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[7].X == 9
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[7].Y == 17
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[7].X == 9
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[7].Y == 17
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[8].X == 8
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[8].Y == 17
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[8].X == 8
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[8].Y == 17
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[9].X == 7
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[9].Y == 16
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[9].X == 7
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[9].Y == 16
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[10].X == 7
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.Steps[10].Y == 15
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].X == 7
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].Y == 15
 
 
 
