@@ -98,7 +98,7 @@ class MikeAndConquerSimulationClient {
 
 
 
-    void addMinigunnerAtWorldCoordinates(String baseUrl, int minigunnerX, int minigunnerY, boolean aiIsOn) {
+    void addMinigunnerAtWorldCoordinates( int minigunnerX, int minigunnerY, boolean aiIsOn) {
         Unit inputMinigunner = new Unit()
         inputMinigunner.x = minigunnerX
         inputMinigunner.y = minigunnerY
@@ -220,9 +220,9 @@ class MikeAndConquerSimulationClient {
     }
 
 
-    Unit addGDIMinigunnerAtWorldCoordinates(int minigunnerX, int minigunnerY) {
+    void addGDIMinigunnerAtWorldCoordinates(int minigunnerX, int minigunnerY) {
         boolean aiIsOn = false
-        return addMinigunnerAtWorldCoordinates(GDI_MINIGUNNERS_BASE_URL, minigunnerX, minigunnerY, aiIsOn)
+        addMinigunnerAtWorldCoordinates( minigunnerX, minigunnerY, aiIsOn)
     }
 
 

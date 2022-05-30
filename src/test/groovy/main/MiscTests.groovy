@@ -6,6 +6,10 @@ import groovy.json.JsonSlurper
 import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.concurrent.PollingConditions
+import util.TestUtil
+import util.Util
+
+import java.awt.Point
 
 
 class MiscTests extends Specification {
@@ -266,6 +270,107 @@ class MiscTests extends Specification {
         7560                    | "Faster"
         7139                    | "Fastest"
 
+
+    }
+
+
+    def "Move a minigunner and assert correct path is followed"() {
+        given:
+        int minigunnerId = -1
+
+        when:
+        simulationClient.addGDIMinigunnerAtMapSquare(14,13)
+
+
+        then:
+        TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient, 2)
+
+        when:
+        minigunnerId = TestUtil.assertMinigunnerCreatedEventReceived(simulationClient)
+
+        then:
+        assert minigunnerId != -1
+
+
+        when:
+//        uiClient.selectUnit(minigunnerId)
+        Point destinationAsWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(7,15)
+
+        int destinationXInWorldCoordinates = destinationAsWorldCoordinates.x
+        int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
+
+
+        simulationClient.moveUnit(minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
+
+        and:
+        int expectedTotalEvents = 220
+
+        and:
+        TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient,expectedTotalEvents)
+
+        then:
+        List<SimulationStateUpdateEvent> gameEventList = simulationClient.getSimulationStateUpdateEvents()
+        SimulationStateUpdateEvent expectedUnitOrderedToMoveEvent = gameEventList.get(2)
+        TestUtil.assertUnitOrderedToMoveEvent(expectedUnitOrderedToMoveEvent, minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
+
+        and:
+
+        SimulationStateUpdateEvent expectedUnitMovementPlanCreatedEvent = gameEventList.get(3)
+        assert expectedUnitMovementPlanCreatedEvent.eventType == "UnitMovementPlanCreated"
+
+        def jsonSlurper = new JsonSlurper()
+        def expectedUnitMovementPlanCreatedEventDataAsObject = jsonSlurper.parseText(expectedUnitMovementPlanCreatedEvent.eventData)
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.UnitId == minigunnerId
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps.size() == 11
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[0].X == 14
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[0].Y == 13
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[1].X == 14
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[1].Y == 14
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[2].X == 14
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[2].Y == 15
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[3].X == 13
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[3].Y == 16
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[4].X == 12
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[4].Y == 17
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[5].X == 11
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[5].Y == 17
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[6].X == 10
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[6].Y == 17
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[7].X == 9
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[7].Y == 17
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[8].X == 8
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[8].Y == 17
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[9].X == 7
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[9].Y == 16
+
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].X == 7
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].Y == 15
+
+
+
+//        assert expectedUnitMovementPlanCreatedEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
+//        assert expectedUnitMovementPlanCreatedEventDataAsObject.UnitId == minigunnerId
+
+//         assert "UnitPlansMovementPath" event (or something like that)
+//         assert that actual path, in the for of a list of maptiles, is the correct path
+//
+//         Then assert that the unit starts moving and passes through every map tile in the path, in order
+
+
+        and:
+        SimulationStateUpdateEvent expectedUnitArrivedAtDestinationEvent = gameEventList.get(expectedTotalEvents - 1)
+        TestUtil.assertUnitArrivedAtDestinationEvent(expectedUnitArrivedAtDestinationEvent, minigunnerId)
 
     }
 
