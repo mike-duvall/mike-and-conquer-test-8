@@ -321,7 +321,9 @@ class MiscTests extends Specification {
         def jsonSlurper = new JsonSlurper()
         def expectedUnitMovementPlanCreatedEventDataAsObject = jsonSlurper.parseText(expectedUnitMovementPlanCreatedEvent.eventData)
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.NumSteps == 11
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.UnitId == minigunnerId
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps.size() == 11
+
         assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[0].X == 14
         assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[0].Y == 13
 

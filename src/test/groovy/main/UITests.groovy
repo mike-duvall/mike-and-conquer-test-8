@@ -38,7 +38,7 @@ class UITests extends Specification {
 
     }
 
-    def "Move a minigunner with mouse clicks"() {
+    def "Select and move a minigunner with mouse clicks"() {
         given:
         uiClient.startScenario()
         int minigunnerId = -1
