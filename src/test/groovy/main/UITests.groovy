@@ -3,10 +3,7 @@ package main
 
 import client.MikeAndConquerSimulationClient
 import client.MikeAndConquerUIClient
-import domain.Unit
-import groovy.json.JsonSlurper
-import domain.SimulationStateUpdateEvent
-import org.junit.Test
+import domain.event.SimulationStateUpdateEvent
 import spock.lang.Specification
 import util.TestUtil
 import util.Util

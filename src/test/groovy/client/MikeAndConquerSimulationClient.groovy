@@ -1,6 +1,7 @@
 package client
 
 import domain.*
+import domain.event.SimulationStateUpdateEvent
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovyx.net.http.HttpResponseException
