@@ -2,6 +2,8 @@ package main
 
 import client.MikeAndConquerSimulationClient
 import domain.*
+import domain.event.EventBlock
+import domain.event.SimulationStateUpdateEvent
 import groovy.json.JsonSlurper
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -16,6 +18,23 @@ class MiscTests extends Specification {
 
 
     MikeAndConquerSimulationClient simulationClient
+
+    void assertExpectedEventList(List<SimulationStateUpdateEvent> simulationStateUpdateEvents, ArrayList<EventBlock> expectedEventList) {
+        boolean done = false
+        int actualEventIndex = 0
+
+        for(EventBlock eventBlock in expectedEventList) {
+            for(int i = 0; i < eventBlock.numberOfEvents; i++) {
+                SimulationStateUpdateEvent simulationStateUpdateEvent = simulationStateUpdateEvents.get(actualEventIndex)
+                assert simulationStateUpdateEvent.eventType == eventBlock.eventType
+                actualEventIndex++
+            }
+        }
+
+        assert actualEventIndex == simulationStateUpdateEvents.size()
+
+
+    }
 
 
     enum GameSpeed
@@ -80,7 +99,7 @@ class MiscTests extends Specification {
 
         int startXInWorldCoordinates = 12
         int startYInWorldCoordinates = 12
-        List<SimulationStateUpdateEvent>  gameEventList = null
+        List<SimulationStateUpdateEvent> gameEventList = null
         def jsonSlurper = new JsonSlurper()
         long startingTick = -1
         long endingTick = -1
@@ -165,8 +184,8 @@ class MiscTests extends Specification {
         30236                   | "Slowest"
         15120                   | "Slower"
         10082                   | "Slow"
-        7560                   | "Moderate"
-        5040                   | "Normal"
+        7560                    | "Moderate"
+        5040                    | "Normal"
         3697                    | "Fast"
         3024                    | "Faster"
         2855                    | "Fastest"
@@ -183,6 +202,9 @@ class MiscTests extends Specification {
         long startingTick = -1
         long endingTick = -1
         int expectedTotalEvents = 302
+        List<EventBlock> expectedEventList = []
+
+        and:
         SimulationOptions simulationOptions = new SimulationOptions()
         simulationOptions.gameSpeed = gameSpeed
         simulationClient.setGameOptions(simulationOptions)
@@ -197,6 +219,12 @@ class MiscTests extends Specification {
 
         when:
         gameEventList = simulationClient.getSimulationStateUpdateEvents();
+        expectedEventList.add(new EventBlock("InitializeScenario", 1))
+        expectedEventList.add(new EventBlock("MCVCreated", 1))
+
+        then:
+        assertExpectedEventList(gameEventList, expectedEventList)
+
         SimulationStateUpdateEvent unitCreatedEvent = gameEventList.get(1)
 
         then:
@@ -211,7 +239,6 @@ class MiscTests extends Specification {
         int createdUnitId = createdUnit.unitId
 
         then:
-//        assert createdUnit.id == 1
         assert createdUnit.x == startXInWorldCoordinates
         assert createdUnit.x == startYInWorldCoordinates
 
@@ -226,10 +253,17 @@ class MiscTests extends Specification {
         then:
         assertNumberOfSimulationStateUpdateEvents(expectedTotalEvents)
 
+
         when:
         gameEventList = simulationClient.getSimulationStateUpdateEvents()
+        expectedEventList.add(new EventBlock("UnitOrderedToMove",1 ))
+        expectedEventList.add(new EventBlock("UnitPositionChanged",298 ))
+        expectedEventList.add(new EventBlock("UnitArrivedAtDestination",1 ))
 
         then:
+        assertExpectedEventList(gameEventList, expectedEventList)
+
+        and:
         SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
         assert secondEvent.eventType == "UnitOrderedToMove"
 

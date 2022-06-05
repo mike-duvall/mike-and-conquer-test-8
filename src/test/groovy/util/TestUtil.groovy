@@ -2,7 +2,7 @@ package util
 
 import client.MikeAndConquerSimulationClient
 import client.MikeAndConquerUIClient
-import domain.SimulationStateUpdateEvent
+import domain.event.SimulationStateUpdateEvent
 import domain.Unit
 import groovy.json.JsonSlurper
 import spock.util.concurrent.PollingConditions

@@ -1,13 +1,8 @@
-package domain
+package domain.event
 
 class SimulationStateUpdateEvent {
 
-//    int X
-//    int Y
-//    int ID
-
     String eventType
     String eventData
-
 
 }
