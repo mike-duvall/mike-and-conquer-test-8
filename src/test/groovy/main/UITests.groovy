@@ -3,12 +3,13 @@ package main
 
 import client.MikeAndConquerSimulationClient
 import client.MikeAndConquerUIClient
+import domain.Point
 import domain.event.SimulationStateUpdateEvent
 import spock.lang.Specification
 import util.TestUtil
 import util.Util
 
-import java.awt.Point
+
 
 
 class UITests extends Specification {

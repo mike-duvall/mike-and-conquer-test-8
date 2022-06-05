@@ -7,7 +7,6 @@ import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
 
-import java.awt.Point
 
 class MikeAndConquerUIClient {
 

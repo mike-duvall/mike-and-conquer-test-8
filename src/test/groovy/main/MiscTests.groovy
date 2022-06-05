@@ -11,7 +11,7 @@ import spock.util.concurrent.PollingConditions
 import util.TestUtil
 import util.Util
 
-import java.awt.Point
+
 
 
 class MiscTests extends Specification {
@@ -97,8 +97,23 @@ class MiscTests extends Specification {
     def "Assert Jeep travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
         given:
 
-        int startXInWorldCoordinates = 12
-        int startYInWorldCoordinates = 12
+        Point startPointInMapSquareCoordinates = new Point(10,17)
+        Point destinationPointInMapSquareCoordinates = new Point(
+                startPointInMapSquareCoordinates.x + 14,
+                startPointInMapSquareCoordinates.y)
+
+        Point startPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(
+                startPointInMapSquareCoordinates.x,
+                startPointInMapSquareCoordinates.y)
+
+        int startXInWorldCoordinates = startPointInWorldCoordinates.x
+        int startYInWorldCoordinates = startPointInWorldCoordinates.y
+
+
+        Point destinationPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(
+                destinationPointInMapSquareCoordinates.x,
+                destinationPointInMapSquareCoordinates.y)
+
         List<SimulationStateUpdateEvent> gameEventList = null
         def jsonSlurper = new JsonSlurper()
         long startingTick = -1
@@ -110,8 +125,10 @@ class MiscTests extends Specification {
         int allowedDelta = 250
 
         when:
-        simulationClient.addJeepAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
-
+//        simulationClient.addJeepAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
+        simulationClient.addJeepAtMapSquareCoordinates(
+                startPointInMapSquareCoordinates.x,
+                startPointInMapSquareCoordinates.y)
         then:
         assertNumberOfSimulationStateUpdateEvents(2)
 
@@ -131,15 +148,20 @@ class MiscTests extends Specification {
         int createdUnitId = createdUnit.unitId
 
         then:
-//        assert createdUnit.id == 1
         assert createdUnit.x == startXInWorldCoordinates
-        assert createdUnit.x == startYInWorldCoordinates
+        assert createdUnit.y == startYInWorldCoordinates
 
         when:
-        int destinationXInWorldCoordinates = 360 - 12
-        int destinationYInWorldCoordinates = 12
+//        int destinationXInWorldCoordinates = 360 - 12
+//        int destinationYInWorldCoordinates = 12
+        int destinationXInWorldCoordinates = destinationPointInWorldCoordinates.x
+        int destinationYInWorldCoordinates = destinationPointInWorldCoordinates.y
 
-        simulationClient.moveUnit(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
+
+//        simulationClient.moveUnitToWorldCoordinates(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
+        simulationClient.moveUnitToMapSquareCoordinates(createdUnit.unitId,
+                destinationPointInMapSquareCoordinates.x,
+                destinationPointInMapSquareCoordinates.y)
 
         sleep (expectedTimeInMillis - 10000)
 
@@ -181,13 +203,13 @@ class MiscTests extends Specification {
 
         where:
         expectedTimeInMillis   | gameSpeed
-        30236                   | "Slowest"
-        15120                   | "Slower"
-        10082                   | "Slow"
-        7560                    | "Moderate"
-        5040                    | "Normal"
-        3697                    | "Fast"
-        3024                    | "Faster"
+//        30236                   | "Slowest"
+//        15120                   | "Slower"
+//        10082                   | "Slow"
+//        7560                    | "Moderate"
+//        5040                    | "Normal"
+//        3697                    | "Fast"
+//        3024                    | "Faster"
         2855                    | "Fastest"
     }
 
@@ -246,7 +268,7 @@ class MiscTests extends Specification {
         int destinationXInWorldCoordinates = 360 - 12
         int destinationYInWorldCoordinates = 12
 
-        simulationClient.moveUnit(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
+        simulationClient.moveUnitToWorldCoordinates(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
 
         sleep (expectedTimeInMillis - 10000)
 
@@ -295,13 +317,13 @@ class MiscTests extends Specification {
 
         where:
         expectedTimeInMillis    | gameSpeed
-        75597                   | "Slowest"
-        37801                   | "Slower"
-        25201                   | "Slow"
-        18900                   | "Moderate"
-        12601                   | "Normal"
-        9240                    | "Fast"
-        7560                    | "Faster"
+//        75597                   | "Slowest"
+//        37801                   | "Slower"
+//        25201                   | "Slow"
+//        18900                   | "Moderate"
+//        12601                   | "Normal"
+//        9240                    | "Fast"
+//        7560                    | "Faster"
         7139                    | "Fastest"
 
 
@@ -334,7 +356,7 @@ class MiscTests extends Specification {
         int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
 
 
-        simulationClient.moveUnit(minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
+        simulationClient.moveUnitToWorldCoordinates(minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
 
         and:
         int expectedTotalEvents = 220

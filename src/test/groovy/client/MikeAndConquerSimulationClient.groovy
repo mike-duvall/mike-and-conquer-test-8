@@ -9,6 +9,8 @@ import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
 
+
+
 class MikeAndConquerSimulationClient {
 
 
@@ -124,6 +126,12 @@ class MikeAndConquerSimulationClient {
 
     }
 
+    void addJeepAtMapSquareCoordinates(int x, int y ) {
+        Point worldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(x,y)
+        addJeepAtWorldCoordinates(worldCoordinates.x, worldCoordinates.y)
+    }
+
+
     void addJeepAtWorldCoordinates( int x, int y) {
 
         CreateJeepCommand command = new CreateJeepCommand()
@@ -228,11 +236,12 @@ class MikeAndConquerSimulationClient {
 
 
     Unit addGDIMinigunnerAtMapSquare(int x, int y) {
-        int halfMapSquareWidth = Util.mapSquareWidth / 2
-        int worldX = (x * Util.mapSquareWidth) + halfMapSquareWidth
-        int worldY = (y * Util.mapSquareWidth) + halfMapSquareWidth
+//        int halfMapSquareWidth = Util.mapSquareWidth / 2
+//        int worldX = (x * Util.mapSquareWidth) + halfMapSquareWidth
+//        int worldY = (y * Util.mapSquareWidth) + halfMapSquareWidth
 
-        return addGDIMinigunnerAtWorldCoordinates(worldX, worldY)
+        Point worldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(x,y)
+        return addGDIMinigunnerAtWorldCoordinates(worldCoordinates.x,  worldCoordinates.y)
     }
 
 //    Minigunner addNodMinigunnerAtMapSquare(int x, int y, boolean aiIsOn) {
@@ -266,7 +275,18 @@ class MikeAndConquerSimulationClient {
 
     }
 
-    void moveUnit(int unitId, int destinationXInWorldCoordinates, int destinationYInWorldCoordinate) {
+    void moveUnitToMapSquareCoordinates(int unitId, int destinationXInMapSquareCoordaintes, int destinationYInMapSquareCoordaintes) {
+        Point destinationPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(destinationXInMapSquareCoordaintes,destinationYInMapSquareCoordaintes)
+        moveUnitToWorldCoordinates(
+                unitId,
+                destinationPointInWorldCoordinates.x,
+                destinationPointInWorldCoordinates.y
+        )
+
+
+    }
+
+    void moveUnitToWorldCoordinates(int unitId, int destinationXInWorldCoordinates, int destinationYInWorldCoordinate) {
 
         MoveUnitCommand command = new MoveUnitCommand()
         command.commandType = "OrderUnitMove"

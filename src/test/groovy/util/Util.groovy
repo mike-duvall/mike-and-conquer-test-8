@@ -1,7 +1,6 @@
 package util
 
-import java.awt.Point
-
+import domain.Point
 
 
 class Util {
