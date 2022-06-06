@@ -94,7 +94,7 @@ class MiscTests extends Specification {
 
 
     @Unroll
-    def "Assert Jeep travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
+    def "Assert #unitType travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
         given:
 
         Point startPointInMapSquareCoordinates = new Point(10,17)
@@ -118,7 +118,7 @@ class MiscTests extends Specification {
         def jsonSlurper = new JsonSlurper()
         long startingTick = -1
         long endingTick = -1
-        int expectedTotalEvents = 123
+//        int expectedTotalEvents = 123
         SimulationOptions simulationOptions = new SimulationOptions()
         simulationOptions.gameSpeed = gameSpeed
         simulationClient.setGameOptions(simulationOptions)
@@ -126,9 +126,21 @@ class MiscTests extends Specification {
 
         when:
 //        simulationClient.addJeepAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
-        simulationClient.addJeepAtMapSquareCoordinates(
-                startPointInMapSquareCoordinates.x,
-                startPointInMapSquareCoordinates.y)
+//        simulationClient.addJeepAtMapSquareCoordinates(
+//                startPointInMapSquareCoordinates.x,
+//                startPointInMapSquareCoordinates.y)
+        if(unitType == "Jeep") {
+            simulationClient.addJeepAtMapSquareCoordinates(
+                    startPointInMapSquareCoordinates.x,
+                    startPointInMapSquareCoordinates.y)
+        }
+        else if (unitType == "MCV") {
+            simulationClient.addMCVAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
+        }
+        else {
+            throw new Exception ("Unexpected unit type": + unitType)
+        }
+
         then:
         assertNumberOfSimulationStateUpdateEvents(2)
 
@@ -137,7 +149,9 @@ class MiscTests extends Specification {
         SimulationStateUpdateEvent unitCreatedEvent = gameEventList.get(1)
 
         then:
-        assert unitCreatedEvent.eventType == "JeepCreated"
+        String expectedCreationEventType = unitType + "Created"
+//        assert unitCreatedEvent.eventType == "JeepCreated"
+        assert unitCreatedEvent.eventType == expectedCreationEventType
 
         when:
         def unitDataObject = jsonSlurper.parseText(unitCreatedEvent.eventData)
@@ -202,7 +216,7 @@ class MiscTests extends Specification {
         assert totalTime > expectedTimeInMillis - allowedDelta
 
         where:
-        expectedTimeInMillis   | gameSpeed
+        unitType    | expectedTotalEvents | expectedTimeInMillis      | gameSpeed
 //        30236                   | "Slowest"
 //        15120                   | "Slower"
 //        10082                   | "Slow"
@@ -210,7 +224,8 @@ class MiscTests extends Specification {
 //        5040                    | "Normal"
 //        3697                    | "Fast"
 //        3024                    | "Faster"
-        2855                    | "Fastest"
+        "Jeep"      |  123 |  2855                    | "Fastest"
+        "MCV"       |  302 |    7139                    | "Fastest"
     }
 
     @Unroll
