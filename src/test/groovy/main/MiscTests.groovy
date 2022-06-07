@@ -97,22 +97,27 @@ class MiscTests extends Specification {
     def "Assert #unitType travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
         given:
 
-        Point startPointInMapSquareCoordinates = new Point(10,17)
-        Point destinationPointInMapSquareCoordinates = new Point(
-                startPointInMapSquareCoordinates.x + 14,
-                startPointInMapSquareCoordinates.y)
+        WorldCoordinatesLocation unitStartLocation = WorldCoordinatesLocation.CreatFromWorldMapTileCoordinates(10,17)
+//        Point startPointInMapSquareCoordinates = new Point(10,17)
+//        Point destinationPointInMapSquareCoordinates = new Point(
+//                startPointInMapSquareCoordinates.x + 14,
+//                startPointInMapSquareCoordinates.y)
+        WorldCoordinatesLocation unitDestinationLocation = WorldCoordinatesLocation.CreatFromWorldMapTileCoordinates(
+                unitStartLocation.XInWorldMapTileCoordinates() + 14,
+                unitStartLocation.YInWorldMapTileCoordinates()
+        )
 
-        Point startPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(
-                startPointInMapSquareCoordinates.x,
-                startPointInMapSquareCoordinates.y)
-
-        int startXInWorldCoordinates = startPointInWorldCoordinates.x
-        int startYInWorldCoordinates = startPointInWorldCoordinates.y
-
-
-        Point destinationPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(
-                destinationPointInMapSquareCoordinates.x,
-                destinationPointInMapSquareCoordinates.y)
+//        Point startPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(
+//                startPointInMapSquareCoordinates.x,
+//                startPointInMapSquareCoordinates.y)
+//
+//        int startXInWorldCoordinates = startPointInWorldCoordinates.x
+//        int startYInWorldCoordinates = startPointInWorldCoordinates.y
+//
+//
+//        Point destinationPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(
+//                destinationPointInMapSquareCoordinates.x,
+//                destinationPointInMapSquareCoordinates.y)
 
         List<SimulationStateUpdateEvent> gameEventList = null
         def jsonSlurper = new JsonSlurper()
@@ -130,12 +135,16 @@ class MiscTests extends Specification {
 //                startPointInMapSquareCoordinates.x,
 //                startPointInMapSquareCoordinates.y)
         if(unitType == "Jeep") {
-            simulationClient.addJeepAtMapSquareCoordinates(
-                    startPointInMapSquareCoordinates.x,
-                    startPointInMapSquareCoordinates.y)
+//            simulationClient.addJeepAtMapSquareCoordinates(
+//                    startPointInMapSquareCoordinates.x,
+//                    startPointInMapSquareCoordinates.y)
+
+            simulationClient.addJeep(unitStartLocation)
         }
+
         else if (unitType == "MCV") {
-            simulationClient.addMCVAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
+//            simulationClient.addMCVAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
+            simulationClient.addMCV(unitStartLocation)
         }
         else {
             throw new Exception ("Unexpected unit type": + unitType)
@@ -162,20 +171,24 @@ class MiscTests extends Specification {
         int createdUnitId = createdUnit.unitId
 
         then:
-        assert createdUnit.x == startXInWorldCoordinates
-        assert createdUnit.y == startYInWorldCoordinates
+//        assert createdUnit.x == startXInWorldCoordinates
+//        assert createdUnit.y == startYInWorldCoordinates
+        assert createdUnit.x == unitStartLocation.XInWorldCoordinates()
+        assert createdUnit.y == unitStartLocation.YInWorldCoordinates()
 
         when:
 //        int destinationXInWorldCoordinates = 360 - 12
 //        int destinationYInWorldCoordinates = 12
-        int destinationXInWorldCoordinates = destinationPointInWorldCoordinates.x
-        int destinationYInWorldCoordinates = destinationPointInWorldCoordinates.y
+//        int destinationXInWorldCoordinates = destinationPointInWorldCoordinates.x
+//        int destinationYInWorldCoordinates = destinationPointInWorldCoordinates.y
 
 
 //        simulationClient.moveUnitToWorldCoordinates(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
-        simulationClient.moveUnitToMapSquareCoordinates(createdUnit.unitId,
-                destinationPointInMapSquareCoordinates.x,
-                destinationPointInMapSquareCoordinates.y)
+//        simulationClient.moveUnitToMapSquareCoordinates(createdUnit.unitId,
+//                destinationPointInMapSquareCoordinates.x,
+//                destinationPointInMapSquareCoordinates.y)
+
+        simulationClient.moveUnit(createdUnit.unitId, unitDestinationLocation)
 
         sleep (expectedTimeInMillis - 10000)
 
@@ -191,8 +204,11 @@ class MiscTests extends Specification {
 
         def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
 
-        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
-        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
+//        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
+//        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
+        assert secondEventDataAsObject.DestinationXInWorldCoordinates == unitDestinationLocation.XInWorldCoordinates()
+        assert secondEventDataAsObject.DestinationYInWorldCoordinates == unitDestinationLocation.YInWorldCoordinates()
+
         assert secondEventDataAsObject.UnitId == createdUnitId
 
         when:

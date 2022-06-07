@@ -126,6 +126,13 @@ class MikeAndConquerSimulationClient {
 
     }
 
+    void addJeep(WorldCoordinatesLocation worldCoordinatesLocation) {
+        addJeepAtWorldCoordinates(
+                worldCoordinatesLocation.XInWorldCoordinates(),
+                worldCoordinatesLocation.YInWorldCoordinates()
+        )
+    }
+
     void addJeepAtMapSquareCoordinates(int x, int y ) {
         Point worldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(x,y)
         addJeepAtWorldCoordinates(worldCoordinates.x, worldCoordinates.y)
@@ -165,6 +172,14 @@ class MikeAndConquerSimulationClient {
 
 
     }
+
+    void addMCV(WorldCoordinatesLocation worldCoordinatesLocation) {
+        addMCVAtWorldCoordinates(
+                worldCoordinatesLocation.XInWorldCoordinates(),
+                worldCoordinatesLocation.YInWorldCoordinates()
+        )
+    }
+
 
     void addMCVAtWorldCoordinates( int minigunnerX, int minigunnerY) {
         Unit inputMinigunner = new Unit()
@@ -273,6 +288,15 @@ class MikeAndConquerSimulationClient {
 
         //int x = 3
 
+    }
+
+
+    void moveUnit(int unitId, WorldCoordinatesLocation worldCoordinatesLocation) {
+        moveUnitToWorldCoordinates(
+                unitId,
+                worldCoordinatesLocation.XInWorldCoordinates(),
+                worldCoordinatesLocation.YInWorldCoordinates()
+        )
     }
 
     void moveUnitToMapSquareCoordinates(int unitId, int destinationXInMapSquareCoordaintes, int destinationYInMapSquareCoordaintes) {
