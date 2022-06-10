@@ -98,52 +98,29 @@ class MiscTests extends Specification {
         given:
 
         WorldCoordinatesLocation unitStartLocation = WorldCoordinatesLocation.CreatFromWorldMapTileCoordinates(10,17)
-//        Point startPointInMapSquareCoordinates = new Point(10,17)
-//        Point destinationPointInMapSquareCoordinates = new Point(
-//                startPointInMapSquareCoordinates.x + 14,
-//                startPointInMapSquareCoordinates.y)
         WorldCoordinatesLocation unitDestinationLocation = WorldCoordinatesLocation.CreatFromWorldMapTileCoordinates(
                 unitStartLocation.XInWorldMapTileCoordinates() + 14,
                 unitStartLocation.YInWorldMapTileCoordinates()
         )
 
-//        Point startPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(
-//                startPointInMapSquareCoordinates.x,
-//                startPointInMapSquareCoordinates.y)
-//
-//        int startXInWorldCoordinates = startPointInWorldCoordinates.x
-//        int startYInWorldCoordinates = startPointInWorldCoordinates.y
-//
-//
-//        Point destinationPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(
-//                destinationPointInMapSquareCoordinates.x,
-//                destinationPointInMapSquareCoordinates.y)
-
         List<SimulationStateUpdateEvent> gameEventList = null
+        List<EventBlock> expectedEventList = []
+
         def jsonSlurper = new JsonSlurper()
         long startingTick = -1
         long endingTick = -1
 //        int expectedTotalEvents = 123
+
         SimulationOptions simulationOptions = new SimulationOptions()
         simulationOptions.gameSpeed = gameSpeed
         simulationClient.setGameOptions(simulationOptions)
         int allowedDelta = 250
 
         when:
-//        simulationClient.addJeepAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
-//        simulationClient.addJeepAtMapSquareCoordinates(
-//                startPointInMapSquareCoordinates.x,
-//                startPointInMapSquareCoordinates.y)
         if(unitType == "Jeep") {
-//            simulationClient.addJeepAtMapSquareCoordinates(
-//                    startPointInMapSquareCoordinates.x,
-//                    startPointInMapSquareCoordinates.y)
-
             simulationClient.addJeep(unitStartLocation)
         }
-
         else if (unitType == "MCV") {
-//            simulationClient.addMCVAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
             simulationClient.addMCV(unitStartLocation)
         }
         else {
@@ -154,12 +131,18 @@ class MiscTests extends Specification {
         assertNumberOfSimulationStateUpdateEvents(2)
 
         when:
+        String expectedCreationEventType = unitType + "Created"
         gameEventList = simulationClient.getSimulationStateUpdateEvents();
+        expectedEventList.add(new EventBlock("InitializeScenario", 1))
+        expectedEventList.add(new EventBlock(expectedCreationEventType, 1))
+
+        then:
+        assertExpectedEventList(gameEventList, expectedEventList)
+
+        when:
         SimulationStateUpdateEvent unitCreatedEvent = gameEventList.get(1)
 
         then:
-        String expectedCreationEventType = unitType + "Created"
-//        assert unitCreatedEvent.eventType == "JeepCreated"
         assert unitCreatedEvent.eventType == expectedCreationEventType
 
         when:
@@ -171,23 +154,10 @@ class MiscTests extends Specification {
         int createdUnitId = createdUnit.unitId
 
         then:
-//        assert createdUnit.x == startXInWorldCoordinates
-//        assert createdUnit.y == startYInWorldCoordinates
         assert createdUnit.x == unitStartLocation.XInWorldCoordinates()
         assert createdUnit.y == unitStartLocation.YInWorldCoordinates()
 
         when:
-//        int destinationXInWorldCoordinates = 360 - 12
-//        int destinationYInWorldCoordinates = 12
-//        int destinationXInWorldCoordinates = destinationPointInWorldCoordinates.x
-//        int destinationYInWorldCoordinates = destinationPointInWorldCoordinates.y
-
-
-//        simulationClient.moveUnitToWorldCoordinates(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
-//        simulationClient.moveUnitToMapSquareCoordinates(createdUnit.unitId,
-//                destinationPointInMapSquareCoordinates.x,
-//                destinationPointInMapSquareCoordinates.y)
-
         simulationClient.moveUnit(createdUnit.unitId, unitDestinationLocation)
 
         sleep (expectedTimeInMillis - 10000)
@@ -197,15 +167,18 @@ class MiscTests extends Specification {
 
         when:
         gameEventList = simulationClient.getSimulationStateUpdateEvents()
+        expectedEventList.add(new EventBlock("UnitOrderedToMove",1 ))
+        expectedEventList.add(new EventBlock("UnitPositionChanged", expectedTotalEvents - 4 ))
+        expectedEventList.add(new EventBlock("UnitArrivedAtDestination",1 ))
+
+        then:
+        assertExpectedEventList(gameEventList, expectedEventList)
 
         then:
         SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
         assert secondEvent.eventType == "UnitOrderedToMove"
 
         def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
-
-//        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
-//        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
         assert secondEventDataAsObject.DestinationXInWorldCoordinates == unitDestinationLocation.XInWorldCoordinates()
         assert secondEventDataAsObject.DestinationYInWorldCoordinates == unitDestinationLocation.YInWorldCoordinates()
 
@@ -232,133 +205,140 @@ class MiscTests extends Specification {
         assert totalTime > expectedTimeInMillis - allowedDelta
 
         where:
-        unitType    | expectedTotalEvents | expectedTimeInMillis      | gameSpeed
-//        30236                   | "Slowest"
-//        15120                   | "Slower"
-//        10082                   | "Slow"
-//        7560                    | "Moderate"
-//        5040                    | "Normal"
-//        3697                    | "Fast"
-//        3024                    | "Faster"
-        "Jeep"      |  123 |  2855                    | "Fastest"
-        "MCV"       |  302 |    7139                    | "Fastest"
+        unitType    | expectedTotalEvents   | expectedTimeInMillis  | gameSpeed
+        "Jeep"      |  123                  |  30236                | "Slowest"
+        "Jeep"      |  123                  |  15120                | "Slower"
+        "Jeep"      |  123                  |  10082                | "Slow"
+        "Jeep"      |  123                  |  7560                 | "Moderate"
+        "Jeep"      |  123                  |  5040                 | "Normal"
+        "Jeep"      |  123                  | 3697                  | "Fast"
+        "Jeep"      |  123                  | 3024                  | "Faster"
+        "Jeep"      |  123                  | 2855                  | "Fastest"
+        "MCV"       |  302                  | 75597                 | "Slowest"
+        "MCV"       |  302                  | 37801                 | "Slower"
+        "MCV"       |  302                  | 25201                 | "Slow"
+        "MCV"       |  302                  | 18900                 | "Moderate"
+        "MCV"       |  302                  | 12601                 | "Normal"
+        "MCV"       |  302                  | 9240                  | "Fast"
+        "MCV"       |  302                  | 7560                  | "Faster"
+        "MCV"       |  302                  | 7139                  | "Fastest"
     }
 
-    @Unroll
-    def "Assert MCV travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
-
-        given:
-        int startXInWorldCoordinates = 12
-        int startYInWorldCoordinates = 12
-        List<SimulationStateUpdateEvent>  gameEventList = null
-        def jsonSlurper = new JsonSlurper()
-        long startingTick = -1
-        long endingTick = -1
-        int expectedTotalEvents = 302
-        List<EventBlock> expectedEventList = []
-
-        and:
-        SimulationOptions simulationOptions = new SimulationOptions()
-        simulationOptions.gameSpeed = gameSpeed
-        simulationClient.setGameOptions(simulationOptions)
-        int allowedDelta = 250
-
-        when:
-        simulationClient.addMCVAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
-
-
-        then:
-        assertNumberOfSimulationStateUpdateEvents(2)
-
-        when:
-        gameEventList = simulationClient.getSimulationStateUpdateEvents();
-        expectedEventList.add(new EventBlock("InitializeScenario", 1))
-        expectedEventList.add(new EventBlock("MCVCreated", 1))
-
-        then:
-        assertExpectedEventList(gameEventList, expectedEventList)
-
-        SimulationStateUpdateEvent unitCreatedEvent = gameEventList.get(1)
-
-        then:
-        assert unitCreatedEvent.eventType == "MCVCreated"
-
-        when:
-        def UnitDataObject = jsonSlurper.parseText(unitCreatedEvent.eventData)
-        Unit createdUnit = new Unit()
-        createdUnit.unitId = UnitDataObject.UnitId
-        createdUnit.x = UnitDataObject.X
-        createdUnit.y = UnitDataObject.Y
-        int createdUnitId = createdUnit.unitId
-
-        then:
-        assert createdUnit.x == startXInWorldCoordinates
-        assert createdUnit.x == startYInWorldCoordinates
-
-        when:
-        int destinationXInWorldCoordinates = 360 - 12
-        int destinationYInWorldCoordinates = 12
-
-        simulationClient.moveUnitToWorldCoordinates(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
-
-        sleep (expectedTimeInMillis - 10000)
-
-        then:
-        assertNumberOfSimulationStateUpdateEvents(expectedTotalEvents)
-
-
-        when:
-        gameEventList = simulationClient.getSimulationStateUpdateEvents()
-        expectedEventList.add(new EventBlock("UnitOrderedToMove",1 ))
-        expectedEventList.add(new EventBlock("UnitPositionChanged",298 ))
-        expectedEventList.add(new EventBlock("UnitArrivedAtDestination",1 ))
-
-        then:
-        assertExpectedEventList(gameEventList, expectedEventList)
-
-        and:
-        SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
-        assert secondEvent.eventType == "UnitOrderedToMove"
-
-        def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
-
-        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
-        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
-        assert secondEventDataAsObject.UnitId == createdUnitId
-
-        when:
-        startingTick = secondEventDataAsObject.Timestamp
-
-        then:
-        SimulationStateUpdateEvent thirdEvent = gameEventList.get(expectedTotalEvents - 1)
-        assert thirdEvent.eventType == "UnitArrivedAtDestination"
-        def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
-        assert thirdEventDataAsObject.UnitId == createdUnitId
-
-        when:
-        endingTick = thirdEventDataAsObject.Timestamp
-        int startingMilliseconds = startingTick / 10000
-        int endingMilliseconds = endingTick / 10000
-        int totalTime = endingMilliseconds - startingMilliseconds
-        println("totalTime was:" + totalTime)
-
-        then:
-        assert totalTime < expectedTimeInMillis + allowedDelta
-        assert totalTime > expectedTimeInMillis - allowedDelta
-
-        where:
-        expectedTimeInMillis    | gameSpeed
-//        75597                   | "Slowest"
-//        37801                   | "Slower"
-//        25201                   | "Slow"
-//        18900                   | "Moderate"
-//        12601                   | "Normal"
-//        9240                    | "Fast"
-//        7560                    | "Faster"
-        7139                    | "Fastest"
-
-
-    }
+//    @Unroll
+//    def "Assert MCV travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
+//
+//        given:
+//        int startXInWorldCoordinates = 12
+//        int startYInWorldCoordinates = 12
+//        List<SimulationStateUpdateEvent>  gameEventList = null
+//        def jsonSlurper = new JsonSlurper()
+//        long startingTick = -1
+//        long endingTick = -1
+//        int expectedTotalEvents = 302
+//        List<EventBlock> expectedEventList = []
+//
+//        and:
+//        SimulationOptions simulationOptions = new SimulationOptions()
+//        simulationOptions.gameSpeed = gameSpeed
+//        simulationClient.setGameOptions(simulationOptions)
+//        int allowedDelta = 250
+//
+//        when:
+//        simulationClient.addMCVAtWorldCoordinates(startXInWorldCoordinates, startYInWorldCoordinates)
+//
+//
+//        then:
+//        assertNumberOfSimulationStateUpdateEvents(2)
+//
+//        when:
+//        gameEventList = simulationClient.getSimulationStateUpdateEvents();
+//        expectedEventList.add(new EventBlock("InitializeScenario", 1))
+//        expectedEventList.add(new EventBlock("MCVCreated", 1))
+//
+//        then:
+//        assertExpectedEventList(gameEventList, expectedEventList)
+//
+//        SimulationStateUpdateEvent unitCreatedEvent = gameEventList.get(1)
+//
+//        then:
+//        assert unitCreatedEvent.eventType == "MCVCreated"
+//
+//        when:
+//        def UnitDataObject = jsonSlurper.parseText(unitCreatedEvent.eventData)
+//        Unit createdUnit = new Unit()
+//        createdUnit.unitId = UnitDataObject.UnitId
+//        createdUnit.x = UnitDataObject.X
+//        createdUnit.y = UnitDataObject.Y
+//        int createdUnitId = createdUnit.unitId
+//
+//        then:
+//        assert createdUnit.x == startXInWorldCoordinates
+//        assert createdUnit.x == startYInWorldCoordinates
+//
+//        when:
+//        int destinationXInWorldCoordinates = 360 - 12
+//        int destinationYInWorldCoordinates = 12
+//
+//        simulationClient.moveUnitToWorldCoordinates(createdUnit.unitId, destinationXInWorldCoordinates, destinationYInWorldCoordinates )
+//
+//        sleep (expectedTimeInMillis - 10000)
+//
+//        then:
+//        assertNumberOfSimulationStateUpdateEvents(expectedTotalEvents)
+//
+//
+//        when:
+//        gameEventList = simulationClient.getSimulationStateUpdateEvents()
+//        expectedEventList.add(new EventBlock("UnitOrderedToMove",1 ))
+//        expectedEventList.add(new EventBlock("UnitPositionChanged",298 ))
+//        expectedEventList.add(new EventBlock("UnitArrivedAtDestination",1 ))
+//
+//        then:
+//        assertExpectedEventList(gameEventList, expectedEventList)
+//
+//        and:
+//        SimulationStateUpdateEvent secondEvent = gameEventList.get(2)
+//        assert secondEvent.eventType == "UnitOrderedToMove"
+//
+//        def secondEventDataAsObject = jsonSlurper.parseText(secondEvent.eventData)
+//
+//        assert secondEventDataAsObject.DestinationXInWorldCoordinates == destinationXInWorldCoordinates
+//        assert secondEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
+//        assert secondEventDataAsObject.UnitId == createdUnitId
+//
+//        when:
+//        startingTick = secondEventDataAsObject.Timestamp
+//
+//        then:
+//        SimulationStateUpdateEvent thirdEvent = gameEventList.get(expectedTotalEvents - 1)
+//        assert thirdEvent.eventType == "UnitArrivedAtDestination"
+//        def thirdEventDataAsObject = jsonSlurper.parseText(thirdEvent.eventData)
+//        assert thirdEventDataAsObject.UnitId == createdUnitId
+//
+//        when:
+//        endingTick = thirdEventDataAsObject.Timestamp
+//        int startingMilliseconds = startingTick / 10000
+//        int endingMilliseconds = endingTick / 10000
+//        int totalTime = endingMilliseconds - startingMilliseconds
+//        println("totalTime was:" + totalTime)
+//
+//        then:
+//        assert totalTime < expectedTimeInMillis + allowedDelta
+//        assert totalTime > expectedTimeInMillis - allowedDelta
+//
+//        where:
+//        expectedTimeInMillis    | gameSpeed
+////        75597                   | "Slowest"
+////        37801                   | "Slower"
+////        25201                   | "Slow"
+////        18900                   | "Moderate"
+////        12601                   | "Normal"
+////        9240                    | "Fast"
+////        7560                    | "Faster"
+//        7139                    | "Fastest"
+//
+//
+//    }
 
 
     def "Move a minigunner and assert correct path is followed"() {
