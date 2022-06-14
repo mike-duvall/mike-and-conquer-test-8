@@ -7,7 +7,7 @@ import groovy.json.JsonSlurper
 import groovyx.net.http.HttpResponseException
 import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
-import util.Util
+
 
 
 
@@ -101,18 +101,15 @@ class MikeAndConquerSimulationClient {
 
 
 
-    void addMinigunnerAtWorldCoordinates( int minigunnerX, int minigunnerY, boolean aiIsOn) {
-        Unit inputMinigunner = new Unit()
-        inputMinigunner.x = minigunnerX
-        inputMinigunner.y = minigunnerY
+    void addMinigunner( WorldCoordinatesLocation location) {
 
         CreateMinigunnerCommand createUnitCommand = new CreateMinigunnerCommand()
         createUnitCommand.commandType = "CreateMinigunner"
 
         def commandParams =
             [
-                startLocationXInWorldCoordinates: minigunnerX,
-                startLocationYInWorldCoordinates: minigunnerY
+                startLocationXInWorldCoordinates: location.XInWorldCoordinates(),
+                startLocationYInWorldCoordinates: location.YInWorldCoordinates()
             ]
 
         createUnitCommand.commandData =  JsonOutput.toJson(commandParams)
@@ -126,28 +123,15 @@ class MikeAndConquerSimulationClient {
 
     }
 
-    void addJeep(WorldCoordinatesLocation worldCoordinatesLocation) {
-        addJeepAtWorldCoordinates(
-                worldCoordinatesLocation.XInWorldCoordinates(),
-                worldCoordinatesLocation.YInWorldCoordinates()
-        )
-    }
-
-    void addJeepAtMapSquareCoordinates(int x, int y ) {
-        Point worldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(x,y)
-        addJeepAtWorldCoordinates(worldCoordinates.x, worldCoordinates.y)
-    }
-
-
-    void addJeepAtWorldCoordinates( int x, int y) {
+    void addJeep(WorldCoordinatesLocation location) {
 
         CreateJeepCommand command = new CreateJeepCommand()
         command.commandType = "CreateJeep"
 
         def commandParams =
                 [
-                        startLocationXInWorldCoordinates: x,
-                        startLocationYInWorldCoordinates: y
+                        startLocationXInWorldCoordinates: location.XInWorldCoordinates(),
+                        startLocationYInWorldCoordinates: location.YInWorldCoordinates()
                 ]
 
         command.commandData =  JsonOutput.toJson(commandParams)
@@ -173,26 +157,15 @@ class MikeAndConquerSimulationClient {
 
     }
 
-    void addMCV(WorldCoordinatesLocation worldCoordinatesLocation) {
-        addMCVAtWorldCoordinates(
-                worldCoordinatesLocation.XInWorldCoordinates(),
-                worldCoordinatesLocation.YInWorldCoordinates()
-        )
-    }
-
-
-    void addMCVAtWorldCoordinates( int minigunnerX, int minigunnerY) {
-        Unit inputMinigunner = new Unit()
-        inputMinigunner.x = minigunnerX
-        inputMinigunner.y = minigunnerY
+    void addMCV( WorldCoordinatesLocation location) {
 
         CreateMCVCommand command = new CreateMCVCommand()
         command.commandType = "CreateMCV"
 
         def commandParams =
                 [
-                        startLocationXInWorldCoordinates: minigunnerX,
-                        startLocationYInWorldCoordinates: minigunnerY
+                        startLocationXInWorldCoordinates: location.XInWorldCoordinates(),
+                        startLocationYInWorldCoordinates: location.YInWorldCoordinates()
                 ]
 
         command.commandData =  JsonOutput.toJson(commandParams)
@@ -244,30 +217,6 @@ class MikeAndConquerSimulationClient {
     }
 
 
-    void addGDIMinigunnerAtWorldCoordinates(int minigunnerX, int minigunnerY) {
-        boolean aiIsOn = false
-        addMinigunnerAtWorldCoordinates( minigunnerX, minigunnerY, aiIsOn)
-    }
-
-
-    Unit addGDIMinigunnerAtMapSquare(int x, int y) {
-//        int halfMapSquareWidth = Util.mapSquareWidth / 2
-//        int worldX = (x * Util.mapSquareWidth) + halfMapSquareWidth
-//        int worldY = (y * Util.mapSquareWidth) + halfMapSquareWidth
-
-        Point worldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(x,y)
-        return addGDIMinigunnerAtWorldCoordinates(worldCoordinates.x,  worldCoordinates.y)
-    }
-
-//    Minigunner addNodMinigunnerAtMapSquare(int x, int y, boolean aiIsOn) {
-//        int halfMapSquareWidth = Util.mapSquareWidth / 2
-//        int worldX = (x * Util.mapSquareWidth) + halfMapSquareWidth
-//        int worldY = (y * Util.mapSquareWidth) + halfMapSquareWidth
-//
-//        return addNodMinigunnerAtWorldCoordinates(worldX, worldY, aiIsOn)
-//    }
-
-
     def List<SimulationStateUpdateEvent> getSimulationStateUpdateEvents() {
         def resp = restClient.get(
                 path: '/simulation/query/events',
@@ -290,27 +239,7 @@ class MikeAndConquerSimulationClient {
 
     }
 
-
-    void moveUnit(int unitId, WorldCoordinatesLocation worldCoordinatesLocation) {
-        moveUnitToWorldCoordinates(
-                unitId,
-                worldCoordinatesLocation.XInWorldCoordinates(),
-                worldCoordinatesLocation.YInWorldCoordinates()
-        )
-    }
-
-    void moveUnitToMapSquareCoordinates(int unitId, int destinationXInMapSquareCoordaintes, int destinationYInMapSquareCoordaintes) {
-        Point destinationPointInWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(destinationXInMapSquareCoordaintes,destinationYInMapSquareCoordaintes)
-        moveUnitToWorldCoordinates(
-                unitId,
-                destinationPointInWorldCoordinates.x,
-                destinationPointInWorldCoordinates.y
-        )
-
-
-    }
-
-    void moveUnitToWorldCoordinates(int unitId, int destinationXInWorldCoordinates, int destinationYInWorldCoordinate) {
+    void moveUnit(int unitId, WorldCoordinatesLocation location) {
 
         MoveUnitCommand command = new MoveUnitCommand()
         command.commandType = "OrderUnitMove"
@@ -318,8 +247,8 @@ class MikeAndConquerSimulationClient {
         def commandParams =
                 [
                         unitId: unitId,
-                        destinationLocationXInWorldCoordinates: destinationXInWorldCoordinates,
-                        destinationLocationYInWorldCoordinates: destinationYInWorldCoordinate
+                        destinationLocationXInWorldCoordinates: location.XInWorldCoordinates(),
+                        destinationLocationYInWorldCoordinates: location.YInWorldCoordinates()
                 ]
 
         command.commandData =  JsonOutput.toJson(commandParams)

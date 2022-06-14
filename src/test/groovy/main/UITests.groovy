@@ -4,6 +4,7 @@ package main
 import client.MikeAndConquerSimulationClient
 import client.MikeAndConquerUIClient
 import domain.Point
+import domain.WorldCoordinatesLocation
 import domain.event.SimulationStateUpdateEvent
 import spock.lang.Specification
 import util.TestUtil
@@ -42,7 +43,8 @@ class UITests extends Specification {
         int minigunnerId = -1
 
         when:
-        simulationClient.addGDIMinigunnerAtMapSquare(18,14)
+        WorldCoordinatesLocation minigunnerStartLocation = WorldCoordinatesLocation.CreatFromWorldMapTileCoordinates(18,14)
+        simulationClient.addMinigunner(minigunnerStartLocation)
 
         then:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient, 2)

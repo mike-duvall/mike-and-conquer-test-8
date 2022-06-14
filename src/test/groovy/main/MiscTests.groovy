@@ -346,7 +346,8 @@ class MiscTests extends Specification {
         int minigunnerId = -1
 
         when:
-        simulationClient.addGDIMinigunnerAtMapSquare(14,13)
+        WorldCoordinatesLocation startLocation = WorldCoordinatesLocation.CreatFromWorldMapTileCoordinates(14,13)
+        simulationClient.addMinigunner(startLocation)
 
 
         then:
@@ -367,7 +368,11 @@ class MiscTests extends Specification {
         int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
 
 
-        simulationClient.moveUnitToWorldCoordinates(minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
+        WorldCoordinatesLocation destinationLocation =
+                WorldCoordinatesLocation.CreatFromWorldCoordinates(
+                        destinationXInWorldCoordinates,
+                        destinationYInWorldCoordinates)
+        simulationClient.moveUnit(minigunnerId, destinationLocation )
 
         and:
         int expectedTotalEvents = 220
