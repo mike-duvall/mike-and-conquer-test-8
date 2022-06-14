@@ -3,12 +3,11 @@ package main
 
 import client.MikeAndConquerSimulationClient
 import client.MikeAndConquerUIClient
-import domain.Point
 import domain.WorldCoordinatesLocation
 import domain.event.SimulationStateUpdateEvent
 import spock.lang.Specification
 import util.TestUtil
-import util.Util
+
 
 
 
@@ -62,10 +61,10 @@ class UITests extends Specification {
         TestUtil.assertUnitIsSelected(uiClient, minigunnerId)
 
         when:
-        uiClient.leftClickInMapSquareCoordinates(18,12)
-        Point destinationAsWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(18,12)
-        int destinationXInWorldCoordinates = destinationAsWorldCoordinates.x
-        int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
+        WorldCoordinatesLocation leftClickLocation = WorldCoordinatesLocation.CreatFromWorldMapTileCoordinates(18,12)
+        uiClient.leftClickInMapSquareCoordinates(leftClickLocation)
+        int destinationXInWorldCoordinates = leftClickLocation.XInWorldCoordinates()
+        int destinationYInWorldCoordinates =leftClickLocation.YInWorldCoordinates()
 
         and:
         int expectedTotalEvents = 48
