@@ -8,9 +8,6 @@ import groovyx.net.http.HttpResponseException
 import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 
-
-
-
 class MikeAndConquerSimulationClient {
 
 
