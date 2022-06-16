@@ -11,7 +11,11 @@ class WorldCoordinatesLocation {
     private WorldCoordinatesLocation(int x, int y) {
         this.x = x
         this.y = y
+    }
 
+    public WorldCoordinatesLocation(WorldCoordinatesLocationBuilder builder) {
+        this.x = builder.worldCoordinatesX
+        this.y = builder.worldCoordinatesY
     }
 
     int XInWorldCoordinates() {
@@ -30,18 +34,5 @@ class WorldCoordinatesLocation {
         return y / MAP_TILE_WIDTH
     }
 
-    static WorldCoordinatesLocation CreatFromWorldCoordinates(int x, int y) {
-        WorldCoordinatesLocation location = new WorldCoordinatesLocation(x,y)
-        return location
-    }
-
-    static WorldCoordinatesLocation CreatFromWorldMapTileCoordinates(int x, int y) {
-        int halfMapSquareWidth = MAP_TILE_WIDTH / 2
-        int worldX = (x * MAP_TILE_WIDTH) + halfMapSquareWidth
-        int worldY = (y * MAP_TILE_WIDTH) + halfMapSquareWidth
-
-        WorldCoordinatesLocation location = new WorldCoordinatesLocation(worldX, worldY)
-        return location
-    }
 
 }

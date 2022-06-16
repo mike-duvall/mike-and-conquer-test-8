@@ -4,6 +4,7 @@ package main
 import client.MikeAndConquerSimulationClient
 import client.MikeAndConquerUIClient
 import domain.WorldCoordinatesLocation
+import domain.WorldCoordinatesLocationBuilder
 import domain.event.SimulationStateUpdateEvent
 import spock.lang.Specification
 import util.TestUtil
@@ -42,7 +43,11 @@ class UITests extends Specification {
         int minigunnerId = -1
 
         when:
-        WorldCoordinatesLocation minigunnerStartLocation = WorldCoordinatesLocation.CreatFromWorldMapTileCoordinates(18,14)
+        WorldCoordinatesLocation minigunnerStartLocation = new WorldCoordinatesLocationBuilder()
+                .worldMapTileCoordinatesX(18)
+                .worldMapTileCoordinatesY(14)
+                .build()
+
         simulationClient.addMinigunner(minigunnerStartLocation)
 
         then:
@@ -61,7 +66,11 @@ class UITests extends Specification {
         TestUtil.assertUnitIsSelected(uiClient, minigunnerId)
 
         when:
-        WorldCoordinatesLocation leftClickLocation = WorldCoordinatesLocation.CreatFromWorldMapTileCoordinates(18,12)
+        WorldCoordinatesLocation leftClickLocation = new WorldCoordinatesLocationBuilder()
+            .worldMapTileCoordinatesX(18)
+            .worldMapTileCoordinatesY(12)
+            .build()
+
         uiClient.leftClickInMapSquareCoordinates(leftClickLocation)
         int destinationXInWorldCoordinates = leftClickLocation.XInWorldCoordinates()
         int destinationYInWorldCoordinates =leftClickLocation.YInWorldCoordinates()
