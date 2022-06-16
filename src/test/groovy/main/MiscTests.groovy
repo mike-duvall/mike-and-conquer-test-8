@@ -12,10 +12,7 @@ import util.TestUtil
 import util.Util
 
 
-
-
 class MiscTests extends Specification {
-
 
     MikeAndConquerSimulationClient simulationClient
 
@@ -32,7 +29,6 @@ class MiscTests extends Specification {
         }
 
         assert actualEventIndex == simulationStateUpdateEvents.size()
-
 
     }
 
@@ -87,11 +83,7 @@ class MiscTests extends Specification {
         simulationClient.startScenario()
         sleep(1000)
 
-
     }
-
-
-
 
     @Unroll
     def "Assert #unitType travel time is #expectedTimeInMillis ms when gameSpeed is #gameSpeed"() {
@@ -115,7 +107,6 @@ class MiscTests extends Specification {
         def jsonSlurper = new JsonSlurper()
         long startingTick = -1
         long endingTick = -1
-//        int expectedTotalEvents = 123
 
         SimulationOptions simulationOptions = new SimulationOptions()
         simulationOptions.gameSpeed = gameSpeed
@@ -242,9 +233,7 @@ class MiscTests extends Specification {
                 .worldMapTileCoordinatesY(13)
                 .build()
 
-
         simulationClient.addMinigunner(startLocation)
-
 
         then:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient, 2)
@@ -257,12 +246,6 @@ class MiscTests extends Specification {
 
 
         when:
-        Point destinationAsWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(7,15)
-
-        int destinationXInWorldCoordinates = destinationAsWorldCoordinates.x
-        int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
-
-
         WorldCoordinatesLocation destinationLocation = new WorldCoordinatesLocationBuilder()
                 .worldMapTileCoordinatesX(7)
                 .worldMapTileCoordinatesY(15)
@@ -279,7 +262,11 @@ class MiscTests extends Specification {
         then:
         List<SimulationStateUpdateEvent> gameEventList = simulationClient.getSimulationStateUpdateEvents()
         SimulationStateUpdateEvent expectedUnitOrderedToMoveEvent = gameEventList.get(2)
-        TestUtil.assertUnitOrderedToMoveEvent(expectedUnitOrderedToMoveEvent, minigunnerId, destinationXInWorldCoordinates, destinationYInWorldCoordinates)
+        TestUtil.assertUnitOrderedToMoveEvent(
+                expectedUnitOrderedToMoveEvent,
+                minigunnerId,
+                destinationLocation.XInWorldCoordinates(),
+                destinationLocation.YInWorldCoordinates())
 
         and:
 
@@ -325,16 +312,7 @@ class MiscTests extends Specification {
         assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].X == 7
         assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].Y == 15
 
-
-
-//        assert expectedUnitMovementPlanCreatedEventDataAsObject.DestinationYInWorldCoordinates == destinationYInWorldCoordinates
-//        assert expectedUnitMovementPlanCreatedEventDataAsObject.UnitId == minigunnerId
-
-//         assert "UnitPlansMovementPath" event (or something like that)
-//         assert that actual path, in the for of a list of maptiles, is the correct path
-//
 //         Then assert that the unit starts moving and passes through every map tile in the path, in order
-
 
         and:
         SimulationStateUpdateEvent expectedUnitArrivedAtDestinationEvent = gameEventList.get(expectedTotalEvents - 1)

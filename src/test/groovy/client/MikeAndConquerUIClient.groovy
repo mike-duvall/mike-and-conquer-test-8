@@ -90,7 +90,7 @@ class MikeAndConquerUIClient {
     }
 
 
-    void leftClickInMapSquareCoordinates(WorldCoordinatesLocation location) {
+    void leftClick(WorldCoordinatesLocation location) {
 
         // Todo, decided if commands have commandType hard coded, or if we just need Command instead of specific subclasses
         SelectUnitCommand command = new SelectUnitCommand()

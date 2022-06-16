@@ -71,7 +71,7 @@ class UITests extends Specification {
             .worldMapTileCoordinatesY(12)
             .build()
 
-        uiClient.leftClickInMapSquareCoordinates(leftClickLocation)
+        uiClient.leftClick(leftClickLocation)
         int destinationXInWorldCoordinates = leftClickLocation.XInWorldCoordinates()
         int destinationYInWorldCoordinates =leftClickLocation.YInWorldCoordinates()
 
