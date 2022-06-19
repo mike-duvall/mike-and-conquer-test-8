@@ -3,6 +3,7 @@ package main
 import client.MikeAndConquerSimulationClient
 import domain.*
 import domain.event.EventBlock
+import domain.event.FindEventResult
 import domain.event.SimulationStateUpdateEvent
 import groovy.json.JsonSlurper
 import spock.lang.Specification
@@ -227,6 +228,7 @@ class MiscTests extends Specification {
         given:
         int minigunnerId = -1
 
+
         when:
         WorldCoordinatesLocation startLocation = new WorldCoordinatesLocationBuilder()
                 .worldMapTileCoordinatesX(14)
@@ -234,6 +236,8 @@ class MiscTests extends Specification {
                 .build()
 
         simulationClient.addMinigunner(startLocation)
+
+
 
         then:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient, 2)
@@ -254,7 +258,7 @@ class MiscTests extends Specification {
         simulationClient.moveUnit(minigunnerId, destinationLocation )
 
         and:
-        int expectedTotalEvents = 220
+        int expectedTotalEvents = 231
 
         and:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient,expectedTotalEvents)
@@ -312,15 +316,170 @@ class MiscTests extends Specification {
         assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].X == 7
         assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].Y == 15
 
+//        Pickup here
+//        Do below
 //         Then assert that the unit starts moving and passes through every map tile in the path, in order
+        when:
 
-        and:
+        int currentIndex = 3
+//        FindEventResult findEventResult = findNextEventAfter(currentIndex, gameEventList, "UnitArrivedAtPathStep")
+//        currentIndex = findEventResult.index
+//
+//        SimulationStateUpdateEvent unitArrivedAtPathStepEvent = findEventResult.event
+//        assert unitArrivedAtPathStepEvent.eventType == "UnitArrivedAtPathStep"
+//        def unitArrivedAtPathStepEventData = jsonSlurper.parseText(unitArrivedAtPathStepEvent.eventData)
+//        assert unitArrivedAtPathStepEventData.PathStep.X == 14 * 24 + 12
+//        assert unitArrivedAtPathStepEventData.PathStep.Y == 13 * 24 + 12
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        14,
+                        13
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        14,
+                        14
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        14,
+                        15
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        13,
+                        16
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        12,
+                        17
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        11,
+                        17
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        10,
+                        17
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        9,
+                        17
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        8,
+                        17
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        7,
+                        16
+                )
+
+        currentIndex =
+                assertReceivedUnitArrivedAtPathStepEvent(
+                        currentIndex,
+                        gameEventList,
+                        7,
+                        15
+                )
+
+
+//        findEventResult = findNextEventAfter(currentIndex, gameEventList, "UnitArrivedAtPathStep")
+//        currentIndex = findEventResult.index
+//
+//        unitArrivedAtPathStepEvent = findEventResult.event
+//        assert unitArrivedAtPathStepEvent.eventType == "UnitArrivedAtPathStep"
+//        unitArrivedAtPathStepEventData = jsonSlurper.parseText(unitArrivedAtPathStepEvent.eventData)
+//        assert unitArrivedAtPathStepEventData.PathStep.X == 14 * 24 + 12
+//        assert unitArrivedAtPathStepEventData.PathStep.Y == 14 * 24 + 12
+
+
+
+//        def jsonSlurper = new JsonSlurper()
+//        def expectedUnitMovementPlanCreatedEventDataAsObject = jsonSlurper.parseText(expectedUnitMovementPlanCreatedEvent.eventData)
+
+
+        then:
         SimulationStateUpdateEvent expectedUnitArrivedAtDestinationEvent = gameEventList.get(expectedTotalEvents - 1)
         TestUtil.assertUnitArrivedAtDestinationEvent(expectedUnitArrivedAtDestinationEvent, minigunnerId)
 
     }
 
 
+
+    FindEventResult findNextEventAfter(int index,List<SimulationStateUpdateEvent> gameEventList, String eventType) {
+        int totalNumEvents = gameEventList.size()
+        SimulationStateUpdateEvent foundEvent = null
+        boolean  done = false
+        while(!done) {
+
+            SimulationStateUpdateEvent nextEvent = gameEventList.get(index)
+            if(nextEvent.eventType == eventType) {
+                done = true
+                foundEvent = nextEvent
+            }
+
+            if(index >= totalNumEvents - 1) {
+                done = true
+            }
+            index++
+        }
+        FindEventResult result = new FindEventResult()
+        result.event = foundEvent
+        result.index = index
+        return result
+
+    }
+
+    def assertReceivedUnitArrivedAtPathStepEvent(int index, gameEventList, int expectedXInMapTileSquareCoordinates, int expectedYInMapTileSquareCoordinates) {
+        FindEventResult findEventResult = findNextEventAfter(index, gameEventList, "UnitArrivedAtPathStep")
+
+        SimulationStateUpdateEvent unitArrivedAtPathStepEvent = findEventResult.event
+        assert unitArrivedAtPathStepEvent.eventType == "UnitArrivedAtPathStep"
+        def jsonSlurper = new JsonSlurper()
+        def unitArrivedAtPathStepEventData = jsonSlurper.parseText(unitArrivedAtPathStepEvent.eventData)
+        assert unitArrivedAtPathStepEventData.PathStep.X == expectedXInMapTileSquareCoordinates * 24 + 12
+        assert unitArrivedAtPathStepEventData.PathStep.Y == expectedYInMapTileSquareCoordinates * 24 + 12
+
+        return findEventResult.index
+
+    }
 
     def assertNumberOfSimulationStateUpdateEvents(int numEventsToAssert) {
         int timeoutInSeconds = 30
