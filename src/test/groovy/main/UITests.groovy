@@ -20,7 +20,7 @@ class UITests extends Specification {
 
     def setup() {
         String localhost = "localhost"
-        String remoteHost = "192.168.0.186"
+        String remoteHost = "192.168.0.110"
 
 //        String host = localhost
         String host = remoteHost

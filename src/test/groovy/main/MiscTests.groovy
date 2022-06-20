@@ -4,6 +4,7 @@ import client.MikeAndConquerSimulationClient
 import domain.*
 import domain.event.EventBlock
 import domain.event.FindEventResult
+import domain.event.PathStep
 import domain.event.SimulationStateUpdateEvent
 import groovy.json.JsonSlurper
 import spock.lang.Specification
@@ -70,7 +71,7 @@ class MiscTests extends Specification {
 
     def setup() {
         String localhost = "localhost"
-        String remoteHost = "192.168.0.186"
+        String remoteHost = "192.168.0.110"
 
 //        String host = localhost
         String host = remoteHost
@@ -262,6 +263,18 @@ class MiscTests extends Specification {
 
         and:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient,expectedTotalEvents)
+        ArrayList<PathStep> expectedPathSteps = []
+        expectedPathSteps.add( new PathStep(x: 14, y:13))
+        expectedPathSteps.add( new PathStep(x:14, y:14 ))
+        expectedPathSteps.add( new PathStep(x:14 , y:15))
+        expectedPathSteps.add( new PathStep(x:13 , y:16))
+        expectedPathSteps.add( new PathStep(x:12 , y:17))
+        expectedPathSteps.add( new PathStep(x:11 , y:17))
+        expectedPathSteps.add( new PathStep(x:10 , y:17))
+        expectedPathSteps.add( new PathStep(x: 9, y:17))
+        expectedPathSteps.add( new PathStep(x: 8, y:17))
+        expectedPathSteps.add( new PathStep(x: 7, y:16))
+        expectedPathSteps.add( new PathStep(x: 7, y:15))
 
         then:
         List<SimulationStateUpdateEvent> gameEventList = simulationClient.getSimulationStateUpdateEvents()
@@ -280,144 +293,121 @@ class MiscTests extends Specification {
         def jsonSlurper = new JsonSlurper()
         def expectedUnitMovementPlanCreatedEventDataAsObject = jsonSlurper.parseText(expectedUnitMovementPlanCreatedEvent.eventData)
 
+        int expectedNumPathSteps = 11
         assert expectedUnitMovementPlanCreatedEventDataAsObject.UnitId == minigunnerId
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps.size() == 11
+        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps.size() == expectedNumPathSteps
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[0].X == 14
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[0].Y == 13
+        def pathStepList = expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[1].X == 14
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[1].Y == 14
+        int expectedPathStepIndex = 0
+        for(def nextPathStep  : pathStepList) {
+            assert nextPathStep.X == expectedPathSteps[expectedPathStepIndex].x
+            assert nextPathStep.Y == expectedPathSteps[expectedPathStepIndex].y
+            expectedPathStepIndex++
+        }
 
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[2].X == 14
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[2].Y == 15
-
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[3].X == 13
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[3].Y == 16
-
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[4].X == 12
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[4].Y == 17
-
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[5].X == 11
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[5].Y == 17
-
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[6].X == 10
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[6].Y == 17
-
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[7].X == 9
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[7].Y == 17
-
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[8].X == 8
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[8].Y == 17
-
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[9].X == 7
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[9].Y == 16
-
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].X == 7
-        assert expectedUnitMovementPlanCreatedEventDataAsObject.PathSteps[10].Y == 15
-
-//        Pickup here
-//        Do below
-//         Then assert that the unit starts moving and passes through every map tile in the path, in order
         when:
 
-        int currentIndex = 3
-//        FindEventResult findEventResult = findNextEventAfter(currentIndex, gameEventList, "UnitArrivedAtPathStep")
-//        currentIndex = findEventResult.index
+        int currentGameEventListIndex = 3
+
+        for(expectedPathStepIndex = 0; expectedPathStepIndex < expectedNumPathSteps; expectedPathStepIndex++) {
+
+            currentGameEventListIndex =
+                    assertReceivedUnitArrivedAtPathStepEvent(
+                            currentGameEventListIndex,
+                            gameEventList,
+                            expectedPathSteps[expectedPathStepIndex].x,
+                            expectedPathSteps[expectedPathStepIndex].y
+                    )
+        }
+
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        14,
+//                        13
+//                )
 //
-//        SimulationStateUpdateEvent unitArrivedAtPathStepEvent = findEventResult.event
-//        assert unitArrivedAtPathStepEvent.eventType == "UnitArrivedAtPathStep"
-//        def unitArrivedAtPathStepEventData = jsonSlurper.parseText(unitArrivedAtPathStepEvent.eventData)
-//        assert unitArrivedAtPathStepEventData.PathStep.X == 14 * 24 + 12
-//        assert unitArrivedAtPathStepEventData.PathStep.Y == 13 * 24 + 12
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        14,
-                        13
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        14,
-                        14
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        14,
-                        15
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        13,
-                        16
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        12,
-                        17
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        11,
-                        17
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        10,
-                        17
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        9,
-                        17
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        8,
-                        17
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        7,
-                        16
-                )
-
-        currentIndex =
-                assertReceivedUnitArrivedAtPathStepEvent(
-                        currentIndex,
-                        gameEventList,
-                        7,
-                        15
-                )
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        14,
+//                        14
+//                )
+//
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        14,
+//                        15
+//                )
+//
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        13,
+//                        16
+//                )
+//
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        12,
+//                        17
+//                )
+//
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        11,
+//                        17
+//                )
+//
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        10,
+//                        17
+//                )
+//
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        9,
+//                        17
+//                )
+//
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        8,
+//                        17
+//                )
+//
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        7,
+//                        16
+//                )
+//
+//        currentGameEventListIndex =
+//                assertReceivedUnitArrivedAtPathStepEvent(
+//                        currentGameEventListIndex,
+//                        gameEventList,
+//                        7,
+//                        15
+//                )
 
 
 //        findEventResult = findNextEventAfter(currentIndex, gameEventList, "UnitArrivedAtPathStep")
