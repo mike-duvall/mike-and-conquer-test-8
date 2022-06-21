@@ -76,7 +76,7 @@ class UITests extends Specification {
         int destinationYInWorldCoordinates =leftClickLocation.YInWorldCoordinates()
 
         and:
-        int expectedTotalEvents = 48
+        int expectedTotalEvents = 51
 
         and:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient,expectedTotalEvents)
@@ -91,8 +91,5 @@ class UITests extends Specification {
         TestUtil.assertUnitArrivedAtDestinationEvent(expectedUnitArrivedAtDestinationEvent, minigunnerId)
 
     }
-
-
-
 
 }
