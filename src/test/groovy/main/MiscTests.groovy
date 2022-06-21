@@ -285,8 +285,7 @@ class MiscTests extends Specification {
                 destinationLocation.XInWorldCoordinates(),
                 destinationLocation.YInWorldCoordinates())
 
-        and:
-
+        and: "Planned path is equal to expected path"
         SimulationStateUpdateEvent expectedUnitMovementPlanCreatedEvent = gameEventList.get(3)
         assert expectedUnitMovementPlanCreatedEvent.eventType == "UnitMovementPlanCreated"
 
@@ -306,8 +305,7 @@ class MiscTests extends Specification {
             expectedPathStepIndex++
         }
 
-        when:
-
+        and: "Actual traveled path is equal to expected path"
         int currentGameEventListIndex = 3
 
         for(expectedPathStepIndex = 0; expectedPathStepIndex < expectedNumPathSteps; expectedPathStepIndex++) {
@@ -321,109 +319,8 @@ class MiscTests extends Specification {
                     )
         }
 
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        14,
-//                        13
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        14,
-//                        14
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        14,
-//                        15
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        13,
-//                        16
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        12,
-//                        17
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        11,
-//                        17
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        10,
-//                        17
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        9,
-//                        17
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        8,
-//                        17
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        7,
-//                        16
-//                )
-//
-//        currentGameEventListIndex =
-//                assertReceivedUnitArrivedAtPathStepEvent(
-//                        currentGameEventListIndex,
-//                        gameEventList,
-//                        7,
-//                        15
-//                )
-
-
-//        findEventResult = findNextEventAfter(currentIndex, gameEventList, "UnitArrivedAtPathStep")
-//        currentIndex = findEventResult.index
-//
-//        unitArrivedAtPathStepEvent = findEventResult.event
-//        assert unitArrivedAtPathStepEvent.eventType == "UnitArrivedAtPathStep"
-//        unitArrivedAtPathStepEventData = jsonSlurper.parseText(unitArrivedAtPathStepEvent.eventData)
-//        assert unitArrivedAtPathStepEventData.PathStep.X == 14 * 24 + 12
-//        assert unitArrivedAtPathStepEventData.PathStep.Y == 14 * 24 + 12
-
-
-
-//        def jsonSlurper = new JsonSlurper()
-//        def expectedUnitMovementPlanCreatedEventDataAsObject = jsonSlurper.parseText(expectedUnitMovementPlanCreatedEvent.eventData)
-
+        and: "Assert we are at the end of the event list, no more ArrivedAtPathStep events"
+        assert currentGameEventListIndex == expectedTotalEvents - 1
 
         then:
         SimulationStateUpdateEvent expectedUnitArrivedAtDestinationEvent = gameEventList.get(expectedTotalEvents - 1)
