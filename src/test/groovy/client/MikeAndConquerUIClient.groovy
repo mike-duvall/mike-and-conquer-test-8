@@ -7,7 +7,6 @@ import groovyx.net.http.RESTClient
 import org.apache.http.params.CoreConnectionPNames
 import util.Util
 
-import java.awt.Point
 
 class MikeAndConquerUIClient {
 
@@ -91,11 +90,7 @@ class MikeAndConquerUIClient {
     }
 
 
-    void leftClickInMapSquareCoordinates(int xInMapSquareCoordinates, int yInMapSquareCoordinates) {
-
-        Point pointInWordCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(xInMapSquareCoordinates, yInMapSquareCoordinates)
-        int xInWorldCoordinates = pointInWordCoordinates.x
-        int yInWorldCoordinates = pointInWordCoordinates.y
+    void leftClick(WorldCoordinatesLocation location) {
 
         // Todo, decided if commands have commandType hard coded, or if we just need Command instead of specific subclasses
         SelectUnitCommand command = new SelectUnitCommand()
@@ -103,8 +98,8 @@ class MikeAndConquerUIClient {
 
         def commandParams =
                 [
-                        XInWorldCoordinates: xInWorldCoordinates,
-                        YInWorldCoordinates: yInWorldCoordinates
+                        XInWorldCoordinates: location.XInWorldCoordinates(),
+                        YInWorldCoordinates: location.YInWorldCoordinates()
                 ]
 
         command.commandData =  JsonOutput.toJson(commandParams)

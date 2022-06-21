@@ -3,12 +3,14 @@ package main
 
 import client.MikeAndConquerSimulationClient
 import client.MikeAndConquerUIClient
+import domain.WorldCoordinatesLocation
+import domain.WorldCoordinatesLocationBuilder
 import domain.event.SimulationStateUpdateEvent
 import spock.lang.Specification
 import util.TestUtil
-import util.Util
 
-import java.awt.Point
+
+
 
 
 class UITests extends Specification {
@@ -18,7 +20,7 @@ class UITests extends Specification {
 
     def setup() {
         String localhost = "localhost"
-        String remoteHost = "192.168.0.186"
+        String remoteHost = "192.168.0.110"
 
 //        String host = localhost
         String host = remoteHost
@@ -41,7 +43,12 @@ class UITests extends Specification {
         int minigunnerId = -1
 
         when:
-        simulationClient.addGDIMinigunnerAtMapSquare(18,14)
+        WorldCoordinatesLocation minigunnerStartLocation = new WorldCoordinatesLocationBuilder()
+                .worldMapTileCoordinatesX(18)
+                .worldMapTileCoordinatesY(14)
+                .build()
+
+        simulationClient.addMinigunner(minigunnerStartLocation)
 
         then:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient, 2)
@@ -59,13 +66,17 @@ class UITests extends Specification {
         TestUtil.assertUnitIsSelected(uiClient, minigunnerId)
 
         when:
-        uiClient.leftClickInMapSquareCoordinates(18,12)
-        Point destinationAsWorldCoordinates = Util.convertMapSquareCoordinatesToWorldCoordinates(18,12)
-        int destinationXInWorldCoordinates = destinationAsWorldCoordinates.x
-        int destinationYInWorldCoordinates = destinationAsWorldCoordinates.y
+        WorldCoordinatesLocation leftClickLocation = new WorldCoordinatesLocationBuilder()
+            .worldMapTileCoordinatesX(18)
+            .worldMapTileCoordinatesY(12)
+            .build()
+
+        uiClient.leftClick(leftClickLocation)
+        int destinationXInWorldCoordinates = leftClickLocation.XInWorldCoordinates()
+        int destinationYInWorldCoordinates =leftClickLocation.YInWorldCoordinates()
 
         and:
-        int expectedTotalEvents = 48
+        int expectedTotalEvents = 51
 
         and:
         TestUtil.assertNumberOfSimulationStateUpdateEvents(simulationClient,expectedTotalEvents)
@@ -80,8 +91,5 @@ class UITests extends Specification {
         TestUtil.assertUnitArrivedAtDestinationEvent(expectedUnitArrivedAtDestinationEvent, minigunnerId)
 
     }
-
-
-
 
 }
